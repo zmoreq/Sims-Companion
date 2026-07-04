@@ -1,17 +1,15 @@
-import 'sim_traits.dart';
 import 'city.dart';
 import 'house.dart';
+import 'sim_traits.dart';
 
 class Resident {
   String name;
   String lastName;
-
   int age;
   int days;
-
+  
   final City city;
   final House house;
-
   SimTraits traits;
 
   Resident({
@@ -24,13 +22,15 @@ class Resident {
     SimTraits? traits,
   }) : traits = traits ?? SimTraits();
 
+  bool get isAdult => age >= 18;
+
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'lastName': lastName,
       'age': age,
       'days': days,
-      'city': city.name, // Zapisujemy tylko nazwę miasta
+      'city': city.name,
       'house': house.name,
       'traits': traits.toJson(),
     };
@@ -38,23 +38,19 @@ class Resident {
 
   factory Resident.fromJson(Map<String, dynamic> json, City city, House house) {
     return Resident(
-      name: json['name'],
-      lastName: json['lastName'],
-      age: json['age'],
-      days: json['days'],
+      name: json['name'] ?? "Brak imienia",
+      lastName: json['lastName'] ?? "Brak nazwiska",
+      age: json['age'] ?? 0,
+      days: json['days'] ?? 0,
       city: city,
       house: house,
       traits: json['traits'] != null ? SimTraits.fromJson(json['traits']) : SimTraits(),
     );
   }
 
-  bool isAdult() {
-    return age >= 18;
-  }
-
   void incrementDays() {
     days++;
-    if (days == 4) {
+    if (days >= 4) {
       age++;
       days = 0;
     }
@@ -65,7 +61,7 @@ class Resident {
       days--;
     } else if (age > 0) {
       age--;
-      days = 3; // Cofamy do ostatniego dnia poprzedniego roku
+      days = 3; 
     }
   }
 }

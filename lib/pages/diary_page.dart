@@ -6,26 +6,29 @@ import 'stats_page.dart';
 import 'cities_page.dart';
 
 class DiaryPage extends StatefulWidget {
-  final City? city; // Opcjonalne: jeśli null, pokazujemy staty globalne
+  final City? city; 
   final bool isGlobal;
   final String returnRoute;
 
-  const DiaryPage({super.key, this.city, this.isGlobal = false, required this.returnRoute});
+  const DiaryPage({
+    super.key, 
+    this.city, 
+    this.isGlobal = false, 
+    required this.returnRoute
+  });
 
   @override
   State<DiaryPage> createState() => _DiaryPageState();
 }
 
 class _DiaryPageState extends State<DiaryPage> {
-
   
-
   void _onTapped(int index) {
     switch (index) {
       case 0:
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => CitiesPage()),
-          (route) => false, // Usuwa wszystkie poprzednie strony z stosu
+          MaterialPageRoute(builder: (context) => const CitiesPage()),
+          (route) => false, 
         );
       case 1:
         Navigator.of(context).push(
@@ -44,35 +47,42 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
+  void _handleBackNavigation() {
+    if (widget.returnRoute == "/") {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const CitiesPage()),
+        (route) => false, 
+      );
+    } else {
+      Navigator.of(context).popUntil(ModalRoute.withName(widget.returnRoute)); 
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) {
-        if (didPop) {
-          return; // Pozwól na normalne zachowanie przycisku "wstecz"
-        }
-        if (widget.returnRoute == "/") {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => CitiesPage()),
-            (route) => false, // Usuwa wszystkie poprzednie strony z stosu
-          );
-        } else {
-          Navigator.of(context).popUntil(ModalRoute.withName(widget.returnRoute)); // Inaczej szukaj po etykiecie
-        }
+        if (didPop) return;
+        _handleBackNavigation();
       },
       child: Scaffold(
-        appBar: AppBar(title: Text("Kronika")),
-        body: Center(
-          child: Text(widget.city != null 
-              ? "Kronika miasta: ${widget.city!.name}" 
-              : "Kronika Globalna"),
-        ),
-        // Navbar też tu dodajemy, żeby zachować ciągłość!
+        appBar: AppBar(title: const Text("Kronika")),
+        body: _buildBody(),
         bottomNavigationBar: CustomBottomNav(
-          currentIndex: 4, // Bo to kronika
-          onTap: _onTapped, // Przekazujesz funkcję z DiaryPage
+          currentIndex: 4, 
+          onTap: _onTapped, 
         ),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Center(
+      child: Text(
+        widget.city != null 
+            ? "Kronika miasta: ${widget.city!.name}" 
+            : "Kronika Globalna"
       ),
     );
   }

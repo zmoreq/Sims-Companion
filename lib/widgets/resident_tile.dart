@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/resident.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../models/resident.dart';
 
 class ResidentTile extends StatelessWidget {
   final Resident resident;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
-  ResidentTile({
+  const ResidentTile({
+    super.key,
     required this.resident,
     this.onTap,
     this.onDelete,
@@ -17,12 +18,12 @@ class ResidentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 5),
+      margin: const EdgeInsets.only(bottom: 5),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow
       ),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         onTap: onTap,
         leading: Container(
           width: 48,
@@ -47,11 +48,10 @@ class ResidentTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          "${resident.isAdult() ? "Dorosły" : "Dziecko"}  •  ${resident.age} lat  •  ${resident.traits.aspiration}",
+          "${resident.isAdult ? "Dorosły" : "Dziecko"}  •  ${resident.age} lat  •  ${resident.traits.aspiration}",
           style: GoogleFonts.quicksand(
             fontSize: 14,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
-            
           ),
         ),
         trailing: IconButton(

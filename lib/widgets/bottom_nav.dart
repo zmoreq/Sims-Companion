@@ -22,28 +22,24 @@ class CustomBottomNav extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Theme.of(context).colorScheme.secondaryContainer, // lub surfaceContainer
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
           selectedItemColor: Theme.of(context).colorScheme.onSecondaryContainer,
           unselectedItemColor: Theme.of(context).colorScheme.onSecondaryContainer.withValues(alpha: 0.6),
           showSelectedLabels: true,
           showUnselectedLabels: false,
-          // Trik wizualny: Jeśli wybrano Plusa (index 2), nie podświetlamy niczego innego
           currentIndex: currentIndex == 2 ? 0 : currentIndex, 
           onTap: onTap,
           items: [
-            // 0. GŁÓWNA (Kontekstowa)
             BottomNavigationBarItem(
               icon: Icon(PhosphorIcons.house()),
               activeIcon: Icon(PhosphorIcons.house(PhosphorIconsStyle.bold)),
-              label: 'Główna', // Możesz zmienić na "Miasto" lub "Dom" dynamicznie, jeśli chcesz
+              label: 'Główna',
             ),
-            // 1. STATYSTYKI
             BottomNavigationBarItem(
               icon: Icon(PhosphorIcons.chartBar()),
               activeIcon: Icon(PhosphorIcons.chartBar(PhosphorIconsStyle.bold)),
               label: 'Statystyki',
             ),
-            // 2. PLUS (ŚRODEK)
             BottomNavigationBarItem(
               icon: Container(
                 padding: EdgeInsets.all(10),
@@ -59,13 +55,11 @@ class CustomBottomNav extends StatelessWidget {
               ),
               label: 'Dodaj',
             ),
-            // 3. GENERATOR
             BottomNavigationBarItem(
               icon: Icon(PhosphorIcons.magicWand()),
               activeIcon: Icon(PhosphorIcons.magicWand(PhosphorIconsStyle.bold)),
               label: 'Generator',
             ),
-            // 4. KRONIKA
             BottomNavigationBarItem(
               icon: Icon(PhosphorIcons.book()),
               activeIcon: Icon(PhosphorIcons.book(PhosphorIconsStyle.bold)),

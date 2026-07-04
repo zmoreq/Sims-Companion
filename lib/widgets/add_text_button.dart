@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
-class TextAddButon extends StatelessWidget {
+class TextAddButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String label;
 
-  TextAddButon({
+  const TextAddButton({
+    super.key,
     required this.onPressed,
     required this.label,
   });
 
   @override
   Widget build(BuildContext context) {
-    //final theme = Theme.of(context);
-    
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(

@@ -7,7 +7,6 @@ import 'generator_page.dart';
 import 'cities_page.dart';
 import 'diary_page.dart';
 import '../services/data_service.dart';
-
 import '../widgets/stat_box.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -23,14 +22,28 @@ class StatsPage extends StatefulWidget {
 }
 
 class _StatsPageState extends State<StatsPage> {
-
   City? selectedCity;
-  
+
+  Color _getColorFromString(String colorName) {
+    switch (colorName) {
+      case 'brown': return Colors.brown;
+      case 'blue': return Colors.blue;
+      case 'green': return Colors.green;
+      case 'grey': return Colors.grey;
+      case 'red': return Colors.red;
+      case 'black': return Colors.black;
+      case 'blond': return const Color(0xFFF9A825);
+      case 'white': return Colors.white;
+      case 'orange': return Colors.orange;
+      default: return Colors.transparent;
+    }
+  }
+
   void _onTapped(int index) {
     switch (index) {
       case 0:
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => CitiesPage()),
+          MaterialPageRoute(builder: (context) => const CitiesPage()),
           (route) => false,
         );
       case 1:
@@ -47,271 +60,234 @@ class _StatsPageState extends State<StatsPage> {
         );
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) {
-        if (didPop) {
-          return;
-        }
+        if (didPop) return;
         if (widget.returnRoute == "/") {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => CitiesPage()),
+            MaterialPageRoute(builder: (context) => const CitiesPage()),
             (route) => false,
           );
         } else {
-          Navigator.of(context).popUntil(ModalRoute.withName(widget.returnRoute)); // Inaczej szukaj po etykiecie
+          Navigator.of(context).popUntil(ModalRoute.withName(widget.returnRoute));
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text("Statystyki")),
+        appBar: AppBar(title: const Text("Statystyki")),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildCitySelector(),
+              const SizedBox(height: 10),
+              _buildGeneralStatsRow(),
+              _buildPlaceholderCard(),
+              _buildChartsRow(),
+              const SizedBox(height: 20), // Margines dolny
+            ],
+          ),
+        ),
+        bottomNavigationBar: CustomBottomNav(
+          currentIndex: 1,
+          onTap: _onTapped,
+        ),
+      ),
+    );
+  }
 
-        body: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  ChoiceChip(
-                    label: Text("Wszystko"),
-                    selected: selectedCity == null,
-                    selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    labelStyle: TextStyle(
-                      color: selectedCity == null 
-                          ? Theme.of(context).colorScheme.onTertiaryContainer 
-                          : Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    onSelected: (bool selected) {
-                      setState(() {
-                        selectedCity = null; // Resetujemy filtr
-                      });
-                    },
-                  ),
-                  SizedBox(width: 10),
-                  
-                  ...DataService.cities.map((city) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      
-                      child: ChoiceChip(
-                        label: Text(city.name),
-                        selected: selectedCity == city,
-                        selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        labelStyle: TextStyle(
-                          color: selectedCity == city 
-                              ? Theme.of(context).colorScheme.onTertiaryContainer 
-                              : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        onSelected: (bool selected) {
-                          setState(() {
-                            selectedCity = city;
-                          });
-                        },
-                      ),
-                    );
-                  }),
-                ],
-              )
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: StatBox(
-                      label: "Populacja",
-                      value: StatsService.getTotalPopulation(selectedCity: selectedCity).toString(),
-                      icon: PhosphorIcons.users(PhosphorIconsStyle.bold),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: StatBox(
-                      label: "Domy",
-                      value: StatsService.getTotalHouses(selectedCity: selectedCity).toString(),
-                      icon: PhosphorIcons.house(PhosphorIconsStyle.bold),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: StatBox(
-                      label: "Średni wiek",
-                      value: StatsService.getAverageAge(selectedCity: selectedCity).toString(),
-                      icon: PhosphorIcons.calendar(PhosphorIconsStyle.bold),
-                    ),
-                  ),
-                ],
+  Widget _buildCitySelector() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        children: [
+          _buildFilterChip("Wszystko", isSelected: selectedCity == null, onSelect: () => setState(() => selectedCity = null)),
+          const SizedBox(width: 10),
+          ...DataService.cities.map((city) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: _buildFilterChip(
+                city.name, 
+                isSelected: selectedCity == city, 
+                onSelect: () => setState(() => selectedCity = city)
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Więcej statystyk wkrótce!",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 18,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 250,
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // TEKST W ŚRODKU DZIURY
-                                Text(
-                                  "Kolor oczu",
-                                  style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                ),
-                                // WYKRES DONUT
-                                PieChart(
-                                  PieChartData(
-                                    centerSpaceRadius: 50, // TO ROBI DZIURĘ! Im więcej, tym cieńszy pierścień
-                                    sectionsSpace: 5, // Odstępy między kawałkami
-                                    startDegreeOffset: 0, // Zaczynamy rysować od pionu
-                                    sections: [
-                                      ...StatsService.possibleEyeColors
-                                        .where((color) => StatsService.getEyeColorValueForChart(color, selectedCity) > 0)
-                                        .map((color) => PieChartSectionData(
-                                          color: color,
-                                          value: StatsService.getEyeColorValueForChart(color, selectedCity).toDouble(),
-                                          title: StatsService.getEyeColorPercentageForChart(color, selectedCity),
-                                          radius: 35, // Grubość pierścienia
-                                          titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ThemeData.estimateBrightnessForColor(color) == Brightness.light 
-                                                  ? Colors.black 
-                                                  : Colors.white,),
-                                        )),
-                                      if (StatsService.getResidentsWithNoEyeColor(selectedCity: selectedCity) > 0)
-                                        PieChartSectionData(
-                                          color: Colors.white24,
-                                          value: StatsService.getResidentsWithNoEyeColor(selectedCity: selectedCity).toDouble(),
-                                          title: "None: ${StatsService.getResidentsWithNoEyeColorPercentage(selectedCity: selectedCity)}",
-                                          radius: 35,
-                                          titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ThemeData.estimateBrightnessForColor(Colors.white24) == Brightness.light 
-                                                  ? Colors.black 
-                                                  : Colors.white,),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Container(
-                      height: 250,
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // TEKST W ŚRODKU DZIURY
-                                Text(
-                                  "Kolor włosów",
-                                  style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                ),
-                                // WYKRES DONUT
-                                PieChart(
-                                  PieChartData(
-                                    centerSpaceRadius: 50, // TO ROBI DZIURĘ! Im więcej, tym cieńszy pierścień
-                                    sectionsSpace: 5, // Odstępy między kawałkami
-                                    startDegreeOffset: 0, // Zaczynamy rysować od pionu
-                                    sections: [
-                                      ...StatsService.possibleHairColors
-                                        .where((color) => StatsService.getHairColorValueForChart(color, selectedCity) > 0)
-                                        .map((color) => PieChartSectionData(
-                                          color: color,
-                                          value: StatsService.getHairColorValueForChart(color, selectedCity).toDouble(),
-                                          title: StatsService.getHairColorPercentageForChart(color, selectedCity),
-                                          radius: 35, // Grubość pierścienia
-                                          titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ThemeData.estimateBrightnessForColor(color) == Brightness.light 
-                                                  ? Colors.black 
-                                                  : Colors.white,),
-                                        )),
-                                      if (StatsService.getResidentsWithNoHairColor(selectedCity: selectedCity) > 0)
-                                        PieChartSectionData(
-                                          color: Colors.white24,
-                                          value: StatsService.getResidentsWithNoHairColor(selectedCity: selectedCity).toDouble(),
-                                          title: "None: ${StatsService.getResidentsWithNoHairColorPercentage(selectedCity: selectedCity)}",
-                                          radius: 35,
-                                          titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: ThemeData.estimateBrightnessForColor(Colors.white24) == Brightness.light 
-                                                  ? Colors.black 
-                                                  : Colors.white,),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ),
-                  ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, {required bool isSelected, required VoidCallback onSelect}) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      labelStyle: TextStyle(
+        color: isSelected 
+            ? Theme.of(context).colorScheme.onTertiaryContainer 
+            : Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.bold,
+      ),
+      onSelected: (_) => onSelect(),
+    );
+  }
+
+  Widget _buildGeneralStatsRow() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(child: StatBox(
+            label: "Populacja", 
+            value: StatsService.getTotalPopulation(selectedCity: selectedCity).toString(), 
+            icon: PhosphorIcons.users(PhosphorIconsStyle.bold)
+          )),
+          const SizedBox(width: 10),
+          Expanded(child: StatBox(
+            label: "Domy", 
+            value: StatsService.getTotalHouses(selectedCity: selectedCity).toString(), 
+            icon: PhosphorIcons.house(PhosphorIconsStyle.bold)
+          )),
+          const SizedBox(width: 10),
+          Expanded(child: StatBox(
+            label: "Średni wiek", 
+            value: StatsService.getAverageAge(selectedCity: selectedCity).toString(), 
+            icon: PhosphorIcons.calendar(PhosphorIconsStyle.bold)
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderCard() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Więcej statystyk wkrótce!",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 18,
+                fontStyle: FontStyle.italic,
               ),
             ),
           ],
         ),
-        bottomNavigationBar: CustomBottomNav(
-          currentIndex: 1, // Bo to statystyki
-          onTap: _onTapped, // Przekazujesz funkcję z StatsPage
-        ),
+      )
+    );
+  }
+
+  Widget _buildChartsRow() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildDonutChartCard(
+              title: "Kolor oczu",
+              possibleColors: StatsService.possibleEyeColors,
+              getValue: (color) => StatsService.getEyeColorValueForChart(color, selectedCity: selectedCity),
+              getPercentage: (color) => StatsService.getEyeColorPercentageForChart(color, selectedCity: selectedCity),
+              getMissingValue: () => StatsService.getResidentsWithNoEyeColor(selectedCity: selectedCity),
+              getMissingPercentage: () => StatsService.getResidentsWithNoEyeColorPercentage(selectedCity: selectedCity),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _buildDonutChartCard(
+              title: "Kolor włosów",
+              possibleColors: StatsService.possibleHairColors,
+              getValue: (color) => StatsService.getHairColorValueForChart(color, selectedCity: selectedCity),
+              getPercentage: (color) => StatsService.getHairColorPercentageForChart(color, selectedCity: selectedCity),
+              getMissingValue: () => StatsService.getResidentsWithNoHairColor(selectedCity: selectedCity),
+              getMissingPercentage: () => StatsService.getResidentsWithNoHairColorPercentage(selectedCity: selectedCity),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDonutChartCard({
+    required String title,
+    required List<String> possibleColors,
+    required int Function(String) getValue,
+    required String Function(String) getPercentage,
+    required int Function() getMissingValue,
+    required String Function() getMissingPercentage,
+  }) {
+    return Container(
+      height: 250,
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Text(title, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                PieChart(
+                  PieChartData(
+                    centerSpaceRadius: 50,
+                    sectionsSpace: 5,
+                    startDegreeOffset: 0,
+                    sections: [
+                      ...possibleColors
+                          .where((colorName) => getValue(colorName) > 0)
+                          .map((colorName) {
+                        Color actualColor = _getColorFromString(colorName);
+                        return PieChartSectionData(
+                          color: actualColor,
+                          value: getValue(colorName).toDouble(),
+                          title: getPercentage(colorName),
+                          radius: 35,
+                          titleStyle: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: ThemeData.estimateBrightnessForColor(actualColor) == Brightness.light ? Colors.black : Colors.white,
+                          ),
+                        );
+                      }),
+                      if (getMissingValue() > 0)
+                        PieChartSectionData(
+                          color: Colors.white24,
+                          value: getMissingValue().toDouble(),
+                          title: "Brak: ${getMissingPercentage()}",
+                          radius: 35,
+                          titleStyle: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: ThemeData.estimateBrightnessForColor(Colors.white24) == Brightness.light ? Colors.black : Colors.white,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

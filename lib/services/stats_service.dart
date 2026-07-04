@@ -1,264 +1,84 @@
 import '../models/city.dart';
 import '../models/resident.dart';
 import 'data_service.dart';
-import 'package:flutter/material.dart';
 
 class StatsService {
-
-  static const List<Color> possibleEyeColors = [
-    Colors.brown,
-    Colors.blue,
-    Colors.green,
-    Colors.grey,
-    Colors.red,
+  static const List<String> possibleEyeColors = [
+    'brown', 'blue', 'green', 'grey', 'red'
   ];
 
-  static const List<Color> possibleHairColors = [
-    Colors.black,
-    Colors.brown,
-    Colors.yellow,
-    Colors.grey,
-    Colors.white,
+  static const List<String> possibleHairColors = [
+    'black', 'brown', 'blond', 'grey', 'white' 
   ];
+
+  static List<Resident> _getAllResidents({City? selectedCity}) {
+    if (selectedCity != null) {
+      return selectedCity.houses.expand((house) => house.residents).toList();
+    }
+    return DataService.cities
+        .expand((city) => city.houses)
+        .expand((house) => house.residents)
+        .toList();
+  }
+
+  static String _calculatePercentage(int part, int total) {
+    if (total == 0) return '0%';
+    return '${((part / total) * 100).toStringAsFixed(1)}%';
+  }
 
   static int getTotalPopulation({City? selectedCity}) {
-    if (selectedCity != null) {
-      return selectedCity.population; 
-    }
-    
-    int total = 0;
-    for (var city in DataService.cities) {
-      total += city.population;
-    }
-    return total;
+    if (selectedCity != null) return selectedCity.population;
+    return DataService.cities.fold(0, (sum, city) => sum + city.population);
   }
 
   static int getTotalHouses({City? selectedCity}) {
-    if (selectedCity != null) {
-      return selectedCity.houses.length; 
-    }
-    
-    int total = 0;
-    for (var city in DataService.cities) {
-      total += city.houses.length;
-    }
-    return total;
+    if (selectedCity != null) return selectedCity.houses.length;
+    return DataService.cities.fold(0, (sum, city) => sum + city.houses.length);
   }
   
   static int getAverageAge({City? selectedCity}) {
-    List<Resident> allResidents = [];
+    var residents = _getAllResidents(selectedCity: selectedCity);
+    if (residents.isEmpty) return 0;
     
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-    
-    if (allResidents.isEmpty) return 0;
-    
-    int totalAge = allResidents.fold(0, (sum, resident) => sum + resident.age);
-    return (totalAge / allResidents.length).round();
+    int totalAge = residents.fold(0, (sum, resident) => sum + resident.age);
+    return (totalAge / residents.length).round();
   }
 
-  static int getEyeColorValueForChart(Color? color, City? selectedCity) {
-    if (color == null) return 0;
-
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = 0;
-    for (var resident in allResidents) {
-      if (resident.traits.eyeColor == color) {
-        count++;
-      }
-    }
-    return count;
-    
+  static int getEyeColorValueForChart(String? color, {City? selectedCity}) {
+    var residents = _getAllResidents(selectedCity: selectedCity);
+    return residents.where((r) => r.traits.eyeColor == color).length;
   }
 
-  static int getHairColorValueForChart(Color? color, City? selectedCity) {
-    if (color == null) return 0;
-
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = 0;
-    for (var resident in allResidents) {
-      if (resident.traits.hairColor == color) {
-        count++;
-      }
-    }
-    return count;
-    
+  static int getHairColorValueForChart(String? color, {City? selectedCity}) {
+    var residents = _getAllResidents(selectedCity: selectedCity);
+    return residents.where((r) => r.traits.hairColor == color).length;
   }
 
-  static String getEyeColorPercentageForChart(Color? color, City? selectedCity) {
-    if (color == null) return '0%';
-
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = 0;
-    for (var resident in allResidents) {
-      if (resident.traits.eyeColor == color) {
-        count++;
-      }
-    }
-
-    if (allResidents.isEmpty) return '0%';
-    
-    double percentage = (count / allResidents.length) * 100;
-    return '${percentage.toStringAsFixed(1)}%';
+  static String getEyeColorPercentageForChart(String? color, {City? selectedCity}) {
+    var residents = _getAllResidents(selectedCity: selectedCity);
+    int count = residents.where((r) => r.traits.eyeColor == color).length;
+    return _calculatePercentage(count, residents.length);
   }
 
-  static String getHairColorPercentageForChart(Color? color, City? selectedCity) {
-    if (color == null) return '0%';
-
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = 0;
-    for (var resident in allResidents) {
-      if (resident.traits.hairColor == color) {
-        count++;
-      }
-    }
-
-    if (allResidents.isEmpty) return '0%';
-    
-    double percentage = (count / allResidents.length) * 100;
-    return '${percentage.toStringAsFixed(1)}%';
+  static String getHairColorPercentageForChart(String? color, {City? selectedCity}) {
+    var residents = _getAllResidents(selectedCity: selectedCity);
+    int count = residents.where((r) => r.traits.hairColor == color).length;
+    return _calculatePercentage(count, residents.length);
   }
 
   static int getResidentsWithNoEyeColor({City? selectedCity}) {
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    return allResidents.where((r) => r.traits.eyeColor == null).length;
+    return getEyeColorValueForChart(null, selectedCity: selectedCity);
   }
 
   static int getResidentsWithNoHairColor({City? selectedCity}) {
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    return allResidents.where((r) => r.traits.hairColor == null).length;
+    return getHairColorValueForChart(null, selectedCity: selectedCity);
   }
 
   static String getResidentsWithNoEyeColorPercentage({City? selectedCity}) {
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = allResidents.where((r) => r.traits.eyeColor == null).length;
-
-    if (allResidents.isEmpty) return '0%';
-    
-    double percentage = (count / allResidents.length) * 100;
-    return '${percentage.toStringAsFixed(1)}%';
+    return getEyeColorPercentageForChart(null, selectedCity: selectedCity);
   }
 
   static String getResidentsWithNoHairColorPercentage({City? selectedCity}) {
-    List<Resident> allResidents = [];
-    
-    if (selectedCity != null) {
-      for (var house in selectedCity.houses) {
-        allResidents.addAll(house.residents);
-      }
-    } else {
-      for (var city in DataService.cities) {
-        for (var house in city.houses) {
-          allResidents.addAll(house.residents);
-        }
-      }
-    }
-
-    int count = allResidents.where((r) => r.traits.hairColor == null).length;
-
-    if (allResidents.isEmpty) return '0%';
-    
-    double percentage = (count / allResidents.length) * 100;
-    return '${percentage.toStringAsFixed(1)}%';
+    return getHairColorPercentageForChart(null, selectedCity: selectedCity);
   }
 }

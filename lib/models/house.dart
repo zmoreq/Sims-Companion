@@ -5,58 +5,57 @@ class House {
   String name;
   final City city;
   int days;
-  List<Resident> residents = [];
-  int maxResidents = 8;
+  List<Resident> residents;
+  
+  final int maxResidents = 8;
+
   int get population => residents.length;
 
-  House({required this.name, required this.city, this.days = 0});
+  House({
+    required this.name,
+    required this.city,
+    this.days = 0,
+    List<Resident>? residents,
+  }) : residents = residents ?? [];
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'city': city.name, // Zapisujemy tylko nazwę miasta
-      'residents': residents.map((resident) => resident.toJson()).toList(),
+      'city': city.name, 
       'days': days,
+      'residents': residents.map((resident) => resident.toJson()).toList(),
     };
   }
 
   factory House.fromJson(Map<String, dynamic> json, City city) {
     House house = House(
-      name: json['name'],
+      name: json['name'] ?? "Unknown House",
       city: city,
       days: json['days'] ?? 0,
     );
+
     if (json['residents'] != null) {
-      List<dynamic> residentsList = json['residents'];
-      house.residents = residentsList.map((residentJson) => Resident.fromJson(residentJson, city, house)).toList();
+      house.residents = (json['residents'] as List)
+          .map((residentJson) => Resident.fromJson(residentJson as Map<String, dynamic>, city, house))
+          .toList();
     }
+    
     return house;
   }
 
   void addResident(Resident resident) {
-    residents.add(resident);
+    if (residents.length < maxResidents) residents.add(resident);
   }
   
-  void removeResident(Resident resident) {
-    residents.remove(resident);
+  void removeResident(Resident resident) => residents.remove(resident);
+
+  List<Resident> getResidentsByAge(int targetAge) {
+    return residents.where((resident) => resident.age == targetAge).toList();
   }
 
-  List<Resident> getResidents() {
-    return residents;
-  }
-
-  List<Resident> getResidentsByAge(int age) {
-    return residents.where((resident) => resident.age == age).toList();
-  }
-
-  void incrementDays() {
-    days++;
-  }
-
+  void incrementDays() => days++;
+  
   void decrementDays() {
-    if (days > 0) {
-      days--;
-    }
+    if (days > 0) days--;
   }
-
 }

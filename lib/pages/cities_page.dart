@@ -9,7 +9,6 @@ import 'generator_page.dart';
 import 'diary_page.dart';
 import '../services/data_service.dart';
 
-
 class CitiesPage extends StatefulWidget {
   const CitiesPage({super.key});
 
@@ -18,7 +17,6 @@ class CitiesPage extends StatefulWidget {
 }
 
 class _CitiesPageState extends State<CitiesPage> {
-
   @override
   void initState() {
     super.initState();
@@ -34,7 +32,6 @@ class _CitiesPageState extends State<CitiesPage> {
       case 1:
         Navigator.of(context).push(
           MaterialPageRoute(
-            
             builder: (context) => StatsPage(isGlobal: true, returnRoute: "/"),
           ),
         );
@@ -42,11 +39,11 @@ class _CitiesPageState extends State<CitiesPage> {
         _showAddCityDialog();
       case 3:
         Navigator.of(context).push(
-           MaterialPageRoute(builder: (context) => GeneratorPage(returnRoute: "/")),
+          MaterialPageRoute(builder: (context) => GeneratorPage(returnRoute: "/")),
         );
       case 4:
         Navigator.of(context).push(
-           MaterialPageRoute(builder: (context) => DiaryPage(returnRoute: "/")),
+          MaterialPageRoute(builder: (context) => DiaryPage(returnRoute: "/")),
         );
     }
   }
@@ -54,21 +51,104 @@ class _CitiesPageState extends State<CitiesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildCityList(context), // Po prostu wyświetlamy listę, bez switcha!
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(height: 60),
+              _buildHeader(context),
+              _buildCitiesList(),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: CustomBottomNav(
-        currentIndex: 0, // Tu zawsze jesteśmy na "0" (Główna)
+        currentIndex: 0,
         onTap: _onTapped,
       ),
     );
   }
-  
 
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          "Simsly",
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 48,
+                letterSpacing: 5.0,
+              )
+        ),
+        Text(
+          "Zarządzaj swoją Simsową populacją",
+          style: GoogleFonts.quicksand(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+        Divider(
+          height: 60,
+          thickness: 2,
+          color: Theme.of(context).colorScheme.outline,
+          indent: 25,
+          endIndent: 25,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCitiesList() {
+    return Column(
+      children: DataService.cities.map((cityObject) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: CityCard(
+            city: cityObject,
+            onTap: () => _navigateToCity(cityObject),
+            onDelete: () => _deleteCity(cityObject),
+            onEdit: () => _showEditCityDialog(cityObject),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _navigateToCity(City city) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CityPage(city: city),
+        settings: const RouteSettings(name: "/city"), 
+      ),
+    );
+  }
 
   void _deleteCity(City cityToDelete) {
     setState(() {
       DataService.cities.remove(cityToDelete);
     });
-    DataService.saveData(); // Zapisz zmiany po usunięciu miasta
+    DataService.saveData(); 
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onError,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
   }
 
   Future<void> _showEditCityDialog(City city) async {
@@ -78,27 +158,21 @@ class _CitiesPageState extends State<CitiesPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edytuj nazwę miasta'),
+          title: const Text('Edytuj nazwę miasta'),
           content: TextField(
             controller: nameController,
             autofocus: true,
-            decoration: InputDecoration(hintText: 'Nazwa miasta'),
+            decoration: const InputDecoration(hintText: 'Nazwa miasta'),
           ),
           actions: [
             TextButton(
-              child: Text('Anuluj'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              child: const Text('Anuluj'),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(nameController.text);
-              },
-              child: Text('Zapisz'),
+              style: ElevatedButton.styleFrom(elevation: 0),
+              onPressed: () => Navigator.of(context).pop(nameController.text),
+              child: const Text('Zapisz'),
             ),
           ],
         );
@@ -109,10 +183,11 @@ class _CitiesPageState extends State<CitiesPage> {
       setState(() {
         city.name = updatedName;
       });
-      DataService.saveData(); // Zapisz od razu po edycji
+      DataService.saveData(); 
     }
   }
 
+  // ➕ Dodawanie
   Future<void> _showAddCityDialog() async {
     final TextEditingController nameController = TextEditingController();
 
@@ -120,126 +195,41 @@ class _CitiesPageState extends State<CitiesPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Nazwij swoje miasto'),
+          title: const Text('Nazwij swoje miasto'),
           content: TextField(
             controller: nameController,
             autofocus: true,
-            decoration: InputDecoration(labelText: 'Nazwa miasta'),
+            decoration: const InputDecoration(labelText: 'Nazwa miasta'),
           ),
           actions: [
             TextButton(
-              child: Text('Anuluj'),
-              onPressed: () {
-                Navigator.of(context).pop(null);
-              },
+              child: const Text('Anuluj'),
+              onPressed: () => Navigator.of(context).pop(null),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-              ),
+              style: ElevatedButton.styleFrom(elevation: 0),
               onPressed: () {
                 final input = nameController.text.trim();
                 if (input.isNotEmpty) {
                   Navigator.of(context).pop(input);
-                }
-                else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "Nazwa miasta nie może być pusta!",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onError,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      behavior: SnackBarBehavior.floating,
-                      margin: EdgeInsets.only(bottom: 20, left: 20, right: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
+                } else {
+                  _showErrorSnackbar("Nazwa miasta nie może być pusta!");
                 }
               },
-              child: Text('Dodaj'),
+              child: const Text('Dodaj'),
             ),
           ],
         );
       },
     );
     
-    Future.delayed(const Duration(milliseconds: 500), () {
-      nameController.dispose();
-    });
+    Future.delayed(const Duration(milliseconds: 500), () => nameController.dispose());
 
     if (cityName != null && cityName.isNotEmpty) {
       setState(() {
         DataService.cities.add(City(name: cityName));
       });
-      DataService.saveData(); // Zapisz od razu po dodaniu nowego miasta
+      DataService.saveData(); 
     }
-  }
-
-
-  Widget _buildCityList(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        // Column układa rzeczy jeden pod drugim (pionowo)
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start, // Wyśrodkuj wszystko
-          children: [
-            
-            // TU DODAJESZ SWOJE ELEMENTY (Dzieci Kolumny):
-            SizedBox(height: 60),
-      
-            Text(
-              "Simsly",
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 48,
-                letterSpacing: 5.0,
-              )
-            ),
-      
-            Text("Zarządzaj swoją Simsową populacją",
-              style: GoogleFonts.quicksand(
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-            
-            Divider(
-              height: 60,
-              thickness: 2,
-              color: Theme.of(context).colorScheme.outline,
-              indent: 25,
-              endIndent: 25,
-            ),
-      
-            for (var cityObject in DataService.cities) ...[
-              CityCard(city: cityObject, 
-                onTap: () {
-                  Navigator.of( context).push(
-                    MaterialPageRoute(
-                      builder: (context) => CityPage(city: cityObject),
-                      settings: RouteSettings(name: "/city"), // Ustawiamy nazwę trasy na unikalną dla tego miasta 
-                    ),
-                  );
-                },
-                onDelete: () {
-                  _deleteCity(cityObject);
-                },
-                onEdit: () {
-                  // Przykładowa logika edycji - tutaj możesz dodać dialog do zmiany nazwy
-                  _showEditCityDialog(cityObject);
-                },
-              ),
-              SizedBox(height: 20),
-            ],
-          ],
-        ),
-      ),
-    );
   }
 }
