@@ -10,6 +10,8 @@ import 'diary_page.dart';
 import '../widgets/bottom_nav.dart';
 import 'house_page.dart';
 import '../services/data_service.dart';
+import '../utils/snackbar_utils.dart';
+import '../widgets/remove_dialog.dart';
 
 class CityPage extends StatefulWidget {
   final City city;
@@ -137,11 +139,20 @@ class _CityPageState extends State<CityPage> {
     setState(() {});
   }
 
-  void _deleteHouse(House houseObject) {
-    setState(() {
-      widget.city.removeHouse(houseObject);
-    });
-    DataService.saveData();
+  Future<void> _deleteHouse(House houseObject) async {
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => RemoveDialog(
+        content: "Czy na pewno chcesz usunąć dom ${houseObject.name}?",
+      ),
+    );
+
+    if (confirmDelete == true) {
+      setState(() {
+        widget.city.removeHouse(houseObject);
+      });
+      DataService.saveData();
+    }
   }
 
   void _addDayToHouse(House houseObject) {
@@ -152,21 +163,6 @@ class _CityPageState extends State<CityPage> {
       }
     });
     DataService.saveData();
-  }
-
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Theme.of(context).colorScheme.onError, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
   Future<void> _showAddHouseDialog() async {
@@ -194,7 +190,7 @@ class _CityPageState extends State<CityPage> {
                 if (input.isNotEmpty) {
                   Navigator.of(context).pop(input);
                 } else {
-                  _showErrorSnackbar("Nazwa domu nie może być pusta!");
+                  SnackbarUtils.showError(context, "Nazwa domu nie może być pusta!");
                 }
               },
               child: const Text('Dodaj'),

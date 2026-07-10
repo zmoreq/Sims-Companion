@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../models/resident.dart';
+import '../utils/snackbar_utils.dart';
 
-class ResidentEditDialog extends StatefulWidget {
-  final Resident resident;
+class ResidentFormDialog extends StatefulWidget {
+  final Resident? resident;
 
-  const ResidentEditDialog({super.key, required this.resident});
+  const ResidentFormDialog({super.key, this.resident});
 
   @override
-  State<ResidentEditDialog> createState() => _ResidentEditDialogState();
+  State<ResidentFormDialog> createState() => _ResidentFormDialogState();
 }
 
-class _ResidentEditDialogState extends State<ResidentEditDialog> {
+class _ResidentFormDialogState extends State<ResidentFormDialog> {
   late TextEditingController nameController;
   late TextEditingController lastNameController;
   late TextEditingController ageController;
@@ -31,16 +32,18 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
     'orange': 'Rude', 'grey': 'Szare', 'white': 'Białe',
   };
 
+  bool get isEditing => widget.resident != null;
+
   @override
   void initState() {
     super.initState();
-    nameController = TextEditingController(text: widget.resident.name);
-    lastNameController = TextEditingController(text: widget.resident.lastName);
-    ageController = TextEditingController(text: widget.resident.age.toString());
+    nameController = TextEditingController(text: isEditing ? widget.resident!.name : "");
+    lastNameController = TextEditingController(text: isEditing ? widget.resident!.lastName : "");
+    ageController = TextEditingController(text: isEditing ? widget.resident!.age.toString() : "");
 
-    aspiration = widget.resident.traits.aspiration;
-    eyeColor = widget.resident.traits.eyeColor;
-    hairColor = widget.resident.traits.hairColor;
+    aspiration = isEditing ? widget.resident!.traits.aspiration : "Nieznana";
+    eyeColor = isEditing ? widget.resident!.traits.eyeColor : null;
+    hairColor = isEditing ? widget.resident!.traits.hairColor : null;
   }
 
   @override
@@ -78,10 +81,13 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
       children: [
         Row(
           children: [
-            Icon(PhosphorIcons.info(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.onSurface),
+            Icon(
+              isEditing ? PhosphorIcons.info(PhosphorIconsStyle.bold) : PhosphorIcons.userPlus(PhosphorIconsStyle.bold), 
+              color: Theme.of(context).colorScheme.onSurface
+            ),
             const SizedBox(width: 10),
             Text(
-              "Karta Sima",
+              isEditing ? "Karta Sima" : "Nowy Sim",
               style: GoogleFonts.quicksand(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -92,7 +98,7 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
         ),
         IconButton(
           icon: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.onSurface),
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => Navigator.of(context).pop(null),
         ),
       ],
     );
@@ -121,7 +127,11 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
               Expanded(
                 child: Column(
                   children: [
-                    TextField(controller: nameController, decoration: const InputDecoration(labelText: "Imię", labelStyle: TextStyle(fontWeight: FontWeight.bold))),
+                    TextField(
+                      controller: nameController, 
+                      autofocus: !isEditing,
+                      decoration: const InputDecoration(labelText: "Imię", labelStyle: TextStyle(fontWeight: FontWeight.bold))
+                    ),
                     const SizedBox(height: 10),
                     TextField(controller: lastNameController, decoration: const InputDecoration(labelText: "Nazwisko", labelStyle: TextStyle(fontWeight: FontWeight.bold))),
                   ],
@@ -169,8 +179,11 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
-        onPressed: _saveChanges,
-        child: const Text("Zapisz zmiany", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        onPressed: _handleSave,
+        child: Text(
+          isEditing ? "Zapisz zmiany" : "Dodaj Sima", 
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+        ),
       ),
     );
   }
@@ -188,17 +201,33 @@ class _ResidentEditDialogState extends State<ResidentEditDialog> {
     );
   }
 
-  void _saveChanges() {
-    final newAge = int.tryParse(ageController.text.trim());
-    if (nameController.text.isEmpty || lastNameController.text.isEmpty || newAge == null) return;
+  void _handleSave() {
+    final name = nameController.text.trim();
+    final lastName = lastNameController.text.trim();
+    final age = int.tryParse(ageController.text.trim());
 
-    widget.resident.name = nameController.text.trim();
-    widget.resident.lastName = lastNameController.text.trim();
-    widget.resident.age = newAge;
-    widget.resident.traits.aspiration = aspiration;
-    widget.resident.traits.eyeColor = eyeColor;
-    widget.resident.traits.hairColor = hairColor;
+    if (name.isEmpty || lastName.isEmpty || age == null) {
+      SnackbarUtils.showError(context, "Imię, nazwisko i wiek są wymagane!");
+      return;
+    }
 
-    Navigator.of(context).pop(true);
+    if (isEditing) {
+      widget.resident!.name = name;
+      widget.resident!.lastName = lastName;
+      widget.resident!.age = age;
+      widget.resident!.traits.aspiration = aspiration;
+      widget.resident!.traits.eyeColor = eyeColor;
+      widget.resident!.traits.hairColor = hairColor;
+      Navigator.of(context).pop(true);
+    } else {
+      Navigator.of(context).pop({
+        "name": name,
+        "lastName": lastName,
+        "age": age,
+        "aspiration": aspiration,
+        "eyeColor": eyeColor,
+        "hairColor": hairColor,
+      });
+    }
   }
 }

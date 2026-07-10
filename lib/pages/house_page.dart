@@ -9,7 +9,9 @@ import '../widgets/bottom_nav.dart';
 import '../widgets/resident_tile.dart';
 import '../models/resident.dart';
 import '../services/data_service.dart';
-import '../widgets/resident_edit_dialog.dart';
+import '../widgets/resident_form_dialog.dart';
+import '../utils/snackbar_utils.dart';
+import '../widgets/remove_dialog.dart';
 
 class HousePage extends StatefulWidget {
   final House house;
@@ -36,7 +38,7 @@ class _HousePageState extends State<HousePage> {
         if (widget.house.population < widget.house.maxResidents) {
           _showAddResidentDialog();
         } else {
-          _showErrorSnackbar("Maksymalna liczba mieszkańców osiągnięta!");
+          SnackbarUtils.showError(context, "Maksymalna liczba mieszkańców osiągnięta!");
         }
       case 3:
         Navigator.of(context).push(
@@ -175,7 +177,10 @@ class _HousePageState extends State<HousePage> {
       children: widget.house.residents.map((residentObject) {
         return ResidentTile(
           resident: residentObject,
-          onTap: () => _editResident(residentObject),
+          onTap: () {
+            // TODO: Przejście do strony szczegółów mieszkańca (jeśli ją planujesz)
+          },
+          onEdit: () => _editResident(residentObject), // Edycja przypisana do onEdit
           onDelete: () => _deleteResident(residentObject),
         );
       }).toList(),
@@ -202,17 +207,26 @@ class _HousePageState extends State<HousePage> {
     DataService.saveData();
   }
 
-  void _deleteResident(Resident residentObject) {
-    setState(() {
-      widget.house.removeResident(residentObject);
-    });
-    DataService.saveData();
+  Future<void> _deleteResident(Resident residentObject) async {
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => RemoveDialog(
+        content: "Czy na pewno chcesz usunąć mieszkańca ${residentObject.name} ${residentObject.lastName}?",
+      ),
+    );
+
+    if (confirmDelete == true) {
+      setState(() {
+        widget.house.removeResident(residentObject);
+      });
+      DataService.saveData();
+    }
   }
 
   Future<void> _editResident(Resident residentObject) async {
     final bool? didSave = await showDialog<bool>(
       context: context,
-      builder: (context) => ResidentEditDialog(resident: residentObject),
+      builder: (context) => ResidentFormDialog(resident: residentObject),
     );
     if (didSave == true) {
       setState(() {});
@@ -220,84 +234,27 @@ class _HousePageState extends State<HousePage> {
     }
   }
 
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Theme.of(context).colorScheme.onError, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
   Future<void> _showAddResidentDialog() async {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController lastNameController = TextEditingController();
-    final TextEditingController ageController = TextEditingController();
-
     final Map<String, dynamic>? residentData = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Dodaj nowego mieszkańca"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: nameController, autofocus: true, decoration: const InputDecoration(labelText: "Imię")),
-              TextField(controller: lastNameController, decoration: const InputDecoration(labelText: "Nazwisko")),
-              TextField(controller: ageController, decoration: const InputDecoration(labelText: "Wiek"), keyboardType: TextInputType.number),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: const Text("Anuluj"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                final lastName = lastNameController.text.trim();
-                final age = int.tryParse(ageController.text.trim());
-
-                if (name.isNotEmpty && lastName.isNotEmpty && age != null) {
-                  Navigator.of(context).pop({
-                    "name": name,
-                    "lastName": lastName,
-                    "age": age,
-                  });
-                } else {
-                  _showErrorSnackbar("Imię, nazwisko i wiek są wymagane!");
-                }
-              },
-              child: const Text("Dodaj"),
-            ),
-          ],
-        );
-      }
+      builder: (BuildContext context) => const ResidentFormDialog(),
     );
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      nameController.dispose();
-      lastNameController.dispose();
-      ageController.dispose();
-    });
 
     if (residentData != null) {
       setState(() {
-        widget.house.addResident(
-          Resident(
-            name: residentData["name"],
-            lastName: residentData["lastName"],
-            age: residentData["age"],
-            city: widget.house.city,
-            house: widget.house,
-          ),
+        Resident newResident = Resident(
+          name: residentData["name"],
+          lastName: residentData["lastName"],
+          age: residentData["age"],
+          city: widget.house.city,
+          house: widget.house,
         );
+        
+        newResident.traits.aspiration = residentData["aspiration"];
+        newResident.traits.eyeColor = residentData["eyeColor"];
+        newResident.traits.hairColor = residentData["hairColor"];
+
+        widget.house.addResident(newResident);
       });
       DataService.saveData(); 
     }

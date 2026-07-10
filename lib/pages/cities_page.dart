@@ -8,6 +8,8 @@ import 'stats_page.dart';
 import 'generator_page.dart';
 import 'diary_page.dart';
 import '../services/data_service.dart';
+import '../utils/snackbar_utils.dart';
+import '../widgets/remove_dialog.dart';
 
 class CitiesPage extends StatefulWidget {
   const CitiesPage({super.key});
@@ -74,7 +76,15 @@ class _CitiesPageState extends State<CitiesPage> {
     return Column(
       children: [
         Text(
-          "Simsly",
+          "Sims",
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 48,
+                letterSpacing: 5.0,
+              )
+        ),
+        Text(
+          "Companion",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 48,
@@ -124,31 +134,20 @@ class _CitiesPageState extends State<CitiesPage> {
     );
   }
 
-  void _deleteCity(City cityToDelete) {
-    setState(() {
-      DataService.cities.remove(cityToDelete);
-    });
-    DataService.saveData(); 
-  }
-
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onError,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+  Future<void> _deleteCity(City cityToDelete) async {
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => RemoveDialog(
+        content: "Czy na pewno chcesz usunąć miasto ${cityToDelete.name}? To bezpowrotnie usunie wszystkie domy i mieszkańców w tym mieście.",
       ),
     );
+
+    if (confirmDelete == true) {
+      setState(() {
+        DataService.cities.remove(cityToDelete);
+      });
+      DataService.saveData(); 
+    }
   }
 
   Future<void> _showEditCityDialog(City city) async {
@@ -213,7 +212,7 @@ class _CitiesPageState extends State<CitiesPage> {
                 if (input.isNotEmpty) {
                   Navigator.of(context).pop(input);
                 } else {
-                  _showErrorSnackbar("Nazwa miasta nie może być pusta!");
+                  SnackbarUtils.showError(context, "Nazwa miasta nie może być pusta!");
                 }
               },
               child: const Text('Dodaj'),

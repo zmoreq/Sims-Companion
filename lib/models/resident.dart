@@ -7,6 +7,7 @@ class Resident {
   String lastName;
   int age;
   int days;
+  String notes;
   
   final City city;
   final House house;
@@ -17,6 +18,7 @@ class Resident {
     required this.lastName,
     required this.age,
     this.days = 0,
+    this.notes = "",
     required this.city,
     required this.house,
     SimTraits? traits,
@@ -30,6 +32,7 @@ class Resident {
       'lastName': lastName,
       'age': age,
       'days': days,
+      'notes': notes,
       'city': city.name,
       'house': house.name,
       'traits': traits.toJson(),
@@ -42,6 +45,7 @@ class Resident {
       lastName: json['lastName'] ?? "Brak nazwiska",
       age: json['age'] ?? 0,
       days: json['days'] ?? 0,
+      notes: json['notes'] ?? "",
       city: city,
       house: house,
       traits: json['traits'] != null ? SimTraits.fromJson(json['traits']) : SimTraits(),
