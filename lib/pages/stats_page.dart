@@ -32,9 +32,9 @@ class _StatsPageState extends State<StatsPage> {
       case 'grey': return Colors.grey;
       case 'red': return Colors.red;
       case 'black': return Colors.black;
-      case 'blond': return const Color(0xFFF9A825);
+      case 'blond': return const Color.fromARGB(255, 245, 217, 61);
       case 'white': return Colors.white;
-      case 'orange': return Colors.orange;
+      case 'ginger': return const Color.fromARGB(255, 240, 130, 5);
       default: return Colors.transparent;
     }
   }

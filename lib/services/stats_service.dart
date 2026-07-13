@@ -8,7 +8,7 @@ class StatsService {
   ];
 
   static const List<String> possibleHairColors = [
-    'black', 'brown', 'blond', 'grey', 'white' 
+    'black', 'brown', 'blond', 'grey', 'white', 'ginger'
   ];
 
   static List<Resident> _getAllResidents({City? selectedCity}) {

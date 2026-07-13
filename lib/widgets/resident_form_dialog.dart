@@ -29,7 +29,7 @@ class _ResidentFormDialogState extends State<ResidentFormDialog> {
 
   final Map<String, String> hairColorLabels = {
     'black': 'Czarne', 'brown': 'Brązowe', 'blond': 'Blond',
-    'orange': 'Rude', 'grey': 'Szare', 'white': 'Białe',
+    'ginger': 'Rude', 'grey': 'Szare', 'white': 'Białe',
   };
 
   bool get isEditing => widget.resident != null;

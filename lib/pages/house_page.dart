@@ -12,6 +12,7 @@ import '../services/data_service.dart';
 import '../widgets/resident_form_dialog.dart';
 import '../utils/snackbar_utils.dart';
 import '../widgets/remove_dialog.dart';
+import 'resident_details_page.dart';
 
 class HousePage extends StatefulWidget {
   final House house;
@@ -178,9 +179,13 @@ class _HousePageState extends State<HousePage> {
         return ResidentTile(
           resident: residentObject,
           onTap: () {
-            // TODO: Przejście do strony szczegółów mieszkańca (jeśli ją planujesz)
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ResidentDetailsPage(resident: residentObject),
+              ),
+            );
           },
-          onEdit: () => _editResident(residentObject), // Edycja przypisana do onEdit
+          onEdit: () => _editResident(residentObject),
           onDelete: () => _deleteResident(residentObject),
         );
       }).toList(),

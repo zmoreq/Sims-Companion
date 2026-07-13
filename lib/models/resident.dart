@@ -1,13 +1,15 @@
 import 'city.dart';
 import 'house.dart';
 import 'sim_traits.dart';
+import 'sim_event.dart';
 
 class Resident {
   String name;
   String lastName;
-  int age;
+  int age; // TODO: Age and days need update but after fundamental things are done  
   int days;
-  String notes;
+  String notes; 
+  List<SimEvent> events;
   
   final City city;
   final House house;
@@ -18,11 +20,13 @@ class Resident {
     required this.lastName,
     required this.age,
     this.days = 0,
-    this.notes = "",
+    this.notes = "", 
+    List<SimEvent>? events,
     required this.city,
     required this.house,
     SimTraits? traits,
-  }) : traits = traits ?? SimTraits();
+  }) : traits = traits ?? SimTraits(),
+       events = events ?? [];
 
   bool get isAdult => age >= 18;
 
@@ -32,7 +36,8 @@ class Resident {
       'lastName': lastName,
       'age': age,
       'days': days,
-      'notes': notes,
+      'notes': notes, 
+      'events': events.map((e) => e.toJson()).toList(),
       'city': city.name,
       'house': house.name,
       'traits': traits.toJson(),
@@ -45,7 +50,10 @@ class Resident {
       lastName: json['lastName'] ?? "Brak nazwiska",
       age: json['age'] ?? 0,
       days: json['days'] ?? 0,
-      notes: json['notes'] ?? "",
+      notes: json['notes'] ?? "", 
+      events: json['events'] != null 
+        ? (json['events'] as List).map((e) => SimEvent.fromJson(e)).toList() 
+        : [],
       city: city,
       house: house,
       traits: json['traits'] != null ? SimTraits.fromJson(json['traits']) : SimTraits(),
@@ -54,18 +62,11 @@ class Resident {
 
   void incrementDays() {
     days++;
-    if (days >= 4) {
-      age++;
-      days = 0;
-    }
+    age++; // one day = one year
   }
 
   void decrementDays() {
-    if (days > 0) {
-      days--;
-    } else if (age > 0) {
-      age--;
-      days = 3; 
-    }
+    days--;
+    age--;
   }
 }

@@ -4,6 +4,7 @@ import 'resident.dart';
 class House {
   String name;
   final City city;
+  int turn;
   int days;
   List<Resident> residents;
   
@@ -14,6 +15,7 @@ class House {
   House({
     required this.name,
     required this.city,
+    this.turn = 0,
     this.days = 0,
     List<Resident>? residents,
   }) : residents = residents ?? [];
@@ -22,6 +24,7 @@ class House {
     return {
       'name': name,
       'city': city.name, 
+      'turn': turn,
       'days': days,
       'residents': residents.map((resident) => resident.toJson()).toList(),
     };
@@ -31,6 +34,7 @@ class House {
     House house = House(
       name: json['name'] ?? "Unknown House",
       city: city,
+      turn: json['turn'] ?? 0,
       days: json['days'] ?? 0,
     );
 
@@ -53,7 +57,15 @@ class House {
     return residents.where((resident) => resident.age == targetAge).toList();
   }
 
-  void incrementDays() => days++;
+  void incrementTurn() => turn++;
+
+  void incrementDays() {
+    days++;
+    if (days % 4 == 0) {
+      incrementTurn();
+    }
+
+  }
   
   void decrementDays() {
     if (days > 0) days--;
