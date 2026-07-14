@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/resident.dart';
 import '../widgets/resident_form_dialog.dart';
 import '../widgets/resident_notes_dialog.dart';
@@ -67,12 +67,12 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(PhosphorIcons.notebook(PhosphorIconsStyle.bold)),
+            icon: Icon(PhosphorIcons.notebookBold),
             onPressed: _openNotes,
             tooltip: "Notatki",
           ),
           IconButton(
-            icon: Icon(PhosphorIcons.pencil(PhosphorIconsStyle.bold)),
+            icon: Icon(PhosphorIcons.pencilBold),
             onPressed: _editResident,
             tooltip: "Edytuj Sima",
           ),
@@ -100,7 +100,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: _addEvent,
-                  icon: Icon(PhosphorIcons.plus(PhosphorIconsStyle.bold)),
+                  icon: Icon(PhosphorIcons.plusBold),
                   label: const Text("Dodaj wydarzenie"),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -130,7 +130,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
               border: Border.all(color: Theme.of(context).colorScheme.primary, width: 3),
             ),
             child: Icon(
-              PhosphorIcons.user(PhosphorIconsStyle.fill),
+              PhosphorIcons.user,
               size: 60,
               color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
@@ -185,10 +185,10 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
       mainAxisSpacing: 10,
       crossAxisSpacing: 10,
       children: [
-        _buildTraitCard(context, PhosphorIcons.star(PhosphorIconsStyle.bold), "Aspiracja", widget.resident.traits.aspiration),
-        _buildTraitCard(context, PhosphorIcons.eye(PhosphorIconsStyle.bold), "Oczy", _translateEyeColor(widget.resident.traits.eyeColor)),
-        _buildTraitCard(context, PhosphorIcons.scissors(PhosphorIconsStyle.bold), "Włosy", _translateHairColor(widget.resident.traits.hairColor)),
-        _buildTraitCard(context, PhosphorIcons.house(PhosphorIconsStyle.bold), "Dom", widget.resident.house.name),
+        _buildTraitCard(context, PhosphorIcons.starBold, "Aspiracja", widget.resident.traits.aspiration),
+        _buildTraitCard(context, PhosphorIcons.eyeBold, "Oczy", _translateEyeColor(widget.resident.traits.eyeColor)),
+        _buildTraitCard(context, PhosphorIcons.scissorsBold, "Włosy", _translateHairColor(widget.resident.traits.hairColor)),
+        _buildTraitCard(context, PhosphorIcons.houseBold, "Dom", widget.resident.house.name),
       ],
     );
   }
@@ -239,7 +239,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
         ),
         child: Column(
           children: [
-            Icon(PhosphorIcons.clock(PhosphorIconsStyle.light), size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(PhosphorIcons.clockLight, size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 15),
             Text(
               "Historia życia jest jeszcze pusta.",
@@ -329,12 +329,12 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
 
   IconData _getIconFromKey(String key) {
     switch (key) {
-      case 'baby': return PhosphorIcons.baby(PhosphorIconsStyle.fill);
-      case 'heart': return PhosphorIcons.heart(PhosphorIconsStyle.fill);
-      case 'briefcase': return PhosphorIcons.briefcase(PhosphorIconsStyle.fill);
-      case 'trendUp': return PhosphorIcons.trendUp(PhosphorIconsStyle.fill);
-      case 'house': return PhosphorIcons.house(PhosphorIconsStyle.fill);
-      default: return PhosphorIcons.star(PhosphorIconsStyle.fill);
+      case 'baby': return PhosphorIcons.baby;
+      case 'heart': return PhosphorIcons.heart;
+      case 'briefcase': return PhosphorIcons.briefcase;
+      case 'trendUp': return PhosphorIcons.trendUp;
+      case 'house': return PhosphorIcons.house;
+      default: return PhosphorIcons.star;
     }
   }
 }

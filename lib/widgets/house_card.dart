@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/house.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class HouseCard extends StatelessWidget {
   final House house;
@@ -30,7 +30,7 @@ void _showOptions(BuildContext context) {
         child: Wrap(
           children: [
             ListTile(
-              leading: Icon(PhosphorIcons.pencil()),
+              leading: Icon(PhosphorIcons.pencil),
               title: const Text('Edytuj nazwę'),
               onTap: () {
                 Navigator.of(context).pop();
@@ -39,7 +39,7 @@ void _showOptions(BuildContext context) {
             ),
             
             ListTile(
-              leading: Icon(PhosphorIcons.trash(), color: Theme.of(context).colorScheme.error),
+              leading: Icon(PhosphorIcons.trash, color: Theme.of(context).colorScheme.error),
               title: Text('Usuń dom', style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onTap: () {
                 Navigator.of(context).pop();
@@ -75,9 +75,7 @@ void _showOptions(BuildContext context) {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
-                          child: Icon( PhosphorIcons.house(
-                            PhosphorIconsStyle.bold
-                          ), size: 43, color: Theme.of(context).colorScheme.primary),
+                          child: Icon( PhosphorIcons.houseBold, size: 43, color: Theme.of(context).colorScheme.primary),
                         ),
                         SizedBox(width: 20),
                         Expanded(
@@ -106,13 +104,13 @@ void _showOptions(BuildContext context) {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                Icon( PhosphorIcons.diamond(PhosphorIconsStyle.bold), size: 19, color: Theme.of(context).colorScheme.primary),
+                                Icon( PhosphorIcons.diamondBold, size: 19, color: Theme.of(context).colorScheme.primary),
                                 SizedBox(width: 10),
                                 Text("${house.population}", style: GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 2, color: Theme.of(context).colorScheme.onSecondaryContainer)),
                                 
                                 SizedBox(width: 35),
                           
-                                Icon(PhosphorIcons.clock(PhosphorIconsStyle.bold), size: 19, color: Theme.of(context).colorScheme.primary),
+                                Icon(PhosphorIcons.clockBold, size: 19, color: Theme.of(context).colorScheme.primary),
                                 SizedBox(width: 10),
                                 Text("${house.days}", style: GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 2, color: Theme.of(context).colorScheme.onSecondaryContainer)),
                                 ],
@@ -129,7 +127,7 @@ void _showOptions(BuildContext context) {
                               height: double.infinity,
                               child: Center(
                                 child: Icon(
-                                  PhosphorIcons.clock(PhosphorIconsStyle.bold),
+                                  PhosphorIcons.clockBold,
                                   size: 32, 
                                   color: Theme.of(context).colorScheme.onSecondaryContainer
                                 ),

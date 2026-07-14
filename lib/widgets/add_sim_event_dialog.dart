@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/sim_event.dart';
 import '../models/event_type.dart';
 import '../services/data_service.dart';
@@ -51,7 +51,7 @@ class _AddSimEventDialogState extends State<AddSimEventDialog> {
           children: [
             Row(
               children: [
-                Icon(PhosphorIcons.calendarPlus(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.primary),
+                Icon(PhosphorIcons.calendarPlus, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 10),
                 Text(
                   "Dodaj wydarzenie",
@@ -64,7 +64,7 @@ class _AddSimEventDialogState extends State<AddSimEventDialog> {
               const Text("Brak dostępnych szablonów wydarzeń!")
             else
               DropdownButtonFormField<EventType>(
-                value: selectedEventType,
+                initialValue: selectedEventType,
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: "Typ wydarzenia"),
                 items: DataService.eventTypes.map((EventType type) {

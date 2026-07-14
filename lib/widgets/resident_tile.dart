@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/resident.dart';
 import '../widgets/resident_notes_dialog.dart';
 import '../services/data_service.dart';
@@ -30,7 +30,7 @@ class ResidentTile extends StatelessWidget {
           child: Wrap(
             children: [
               ListTile(
-                leading: Icon(PhosphorIcons.pencil()),
+                leading: Icon(PhosphorIcons.pencil),
                 title: const Text('Edytuj mieszkańca'),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -38,7 +38,7 @@ class ResidentTile extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: Icon(PhosphorIcons.trash(), color: Theme.of(context).colorScheme.error),
+                leading: Icon(PhosphorIcons.trash, color: Theme.of(context).colorScheme.error),
                 title: Text('Usuń', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -83,7 +83,7 @@ class ResidentTile extends StatelessWidget {
           ),
           child: Center(
             child: Icon(
-              PhosphorIcons.user(PhosphorIconsStyle.bold),
+              PhosphorIcons.userBold,
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             )
           ),
@@ -104,7 +104,7 @@ class ResidentTile extends StatelessWidget {
           ),
         ),
         trailing: IconButton(
-          icon: Icon(PhosphorIcons.notebook(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.primary),
+          icon: Icon(PhosphorIcons.notebookBold, color: Theme.of(context).colorScheme.primary),
           onPressed: () {
             _showNotesDialog(context);
           },

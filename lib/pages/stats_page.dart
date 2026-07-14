@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namer_app/services/stats_service.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/city.dart';
 import '../widgets/bottom_nav.dart';
 import 'generator_page.dart';
@@ -145,19 +145,19 @@ class _StatsPageState extends State<StatsPage> {
           Expanded(child: StatBox(
             label: "Populacja", 
             value: StatsService.getTotalPopulation(selectedCity: selectedCity).toString(), 
-            icon: PhosphorIcons.users(PhosphorIconsStyle.bold)
+            icon: PhosphorIcons.usersBold
           )),
           const SizedBox(width: 10),
           Expanded(child: StatBox(
             label: "Domy", 
             value: StatsService.getTotalHouses(selectedCity: selectedCity).toString(), 
-            icon: PhosphorIcons.house(PhosphorIconsStyle.bold)
+            icon: PhosphorIcons.houseBold
           )),
           const SizedBox(width: 10),
           Expanded(child: StatBox(
             label: "Średni wiek", 
             value: StatsService.getAverageAge(selectedCity: selectedCity).toString(), 
-            icon: PhosphorIcons.calendar(PhosphorIconsStyle.bold)
+            icon: PhosphorIcons.calendarBold
           )),
         ],
       ),

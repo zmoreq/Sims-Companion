@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/resident.dart';
 
 class ResidentNotesDialog extends StatefulWidget {
@@ -55,7 +55,7 @@ class _ResidentNotesDialogState extends State<ResidentNotesDialog> {
       children: [
         Row(
           children: [
-            Icon(PhosphorIcons.notebook(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.onSurface),
+            Icon(PhosphorIcons.notebookBold, color: Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 10),
             Text(
               "Notatki",
@@ -68,7 +68,7 @@ class _ResidentNotesDialogState extends State<ResidentNotesDialog> {
           ],
         ),
         IconButton(
-          icon: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(PhosphorIcons.xBold, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(false),
         ),
       ],

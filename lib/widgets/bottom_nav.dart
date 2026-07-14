@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -31,13 +31,13 @@ class CustomBottomNav extends StatelessWidget {
           onTap: onTap,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(PhosphorIcons.house()),
-              activeIcon: Icon(PhosphorIcons.house(PhosphorIconsStyle.bold)),
+              icon: Icon(PhosphorIcons.house),
+              activeIcon: Icon(PhosphorIcons.houseBold),
               label: 'Główna',
             ),
             BottomNavigationBarItem(
-              icon: Icon(PhosphorIcons.chartBar()),
-              activeIcon: Icon(PhosphorIcons.chartBar(PhosphorIconsStyle.bold)),
+              icon: Icon(PhosphorIcons.chartBar),
+              activeIcon: Icon(PhosphorIcons.chartBarBold),
               label: 'Statystyki',
             ),
             BottomNavigationBarItem(
@@ -49,20 +49,20 @@ class CustomBottomNav extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  PhosphorIcons.plus(PhosphorIconsStyle.bold), 
+                  PhosphorIcons.plusBold, 
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               label: 'Dodaj',
             ),
             BottomNavigationBarItem(
-              icon: Icon(PhosphorIcons.magicWand()),
-              activeIcon: Icon(PhosphorIcons.magicWand(PhosphorIconsStyle.bold)),
+              icon: Icon(PhosphorIcons.magicWand),
+              activeIcon: Icon(PhosphorIcons.magicWandBold),
               label: 'Generator',
             ),
             BottomNavigationBarItem(
-              icon: Icon(PhosphorIcons.book()),
-              activeIcon: Icon(PhosphorIcons.book(PhosphorIconsStyle.bold)),
+              icon: Icon(PhosphorIcons.book),
+              activeIcon: Icon(PhosphorIcons.bookBold),
               label: 'Kronika',
             ),
           ],

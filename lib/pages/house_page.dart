@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/house.dart';
 import 'stats_page.dart';
 import 'generator_page.dart';
@@ -81,7 +81,7 @@ class _HousePageState extends State<HousePage> {
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
       actions: [
         IconButton(
-          icon: Icon(PhosphorIcons.gear(PhosphorIconsStyle.bold)),
+          icon: Icon(PhosphorIcons.gearBold),
           onPressed: () {}, // TODO: Ustawienia
         )
       ],
@@ -119,7 +119,7 @@ class _HousePageState extends State<HousePage> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          icon: Icon(PhosphorIcons.minus(PhosphorIconsStyle.bold), size: 26, color: Theme.of(context).colorScheme.onPrimary),
+          icon: Icon(PhosphorIcons.minusBold, size: 26, color: Theme.of(context).colorScheme.onPrimary),
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -149,7 +149,7 @@ class _HousePageState extends State<HousePage> {
           ],
         ),
         IconButton(
-          icon: Icon(PhosphorIcons.plus(PhosphorIconsStyle.bold), size: 26, color: Theme.of(context).colorScheme.onPrimary),
+          icon: Icon(PhosphorIcons.plusBold, size: 26, color: Theme.of(context).colorScheme.onPrimary),
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/house.dart';
 import '../models/city.dart';
 import '../widgets/house_card.dart';
@@ -73,7 +73,7 @@ class _CityPageState extends State<CityPage> {
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       actions: [
         IconButton(
-          icon: Icon(PhosphorIcons.gear(PhosphorIconsStyle.bold)),
+          icon: Icon(PhosphorIcons.gearBold),
           onPressed: () {
             // TODO: Ustawienia miasta
           },

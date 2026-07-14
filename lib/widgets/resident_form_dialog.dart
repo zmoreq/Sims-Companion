@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../models/resident.dart';
 import '../utils/snackbar_utils.dart';
 
@@ -82,7 +82,7 @@ class _ResidentFormDialogState extends State<ResidentFormDialog> {
         Row(
           children: [
             Icon(
-              isEditing ? PhosphorIcons.info(PhosphorIconsStyle.bold) : PhosphorIcons.userPlus(PhosphorIconsStyle.bold), 
+              isEditing ? PhosphorIcons.infoBold : PhosphorIcons.userPlusBold,
               color: Theme.of(context).colorScheme.onSurface
             ),
             const SizedBox(width: 10),
@@ -97,7 +97,7 @@ class _ResidentFormDialogState extends State<ResidentFormDialog> {
           ],
         ),
         IconButton(
-          icon: Icon(PhosphorIcons.x(PhosphorIconsStyle.bold), color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(PhosphorIcons.xBold, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(null),
         ),
       ],
@@ -121,7 +121,7 @@ class _ResidentFormDialogState extends State<ResidentFormDialog> {
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(PhosphorIcons.user(PhosphorIconsStyle.bold), size: 60, color: Theme.of(context).colorScheme.onSurface),
+                child: Icon(PhosphorIcons.userPlusBold, size: 60, color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(width: 20),
               Expanded(
