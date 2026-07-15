@@ -67,10 +67,8 @@ class ResidentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 5),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow
-      ),
       child: ListTile(
+        tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         onTap: onTap,
         onLongPress: () => _showOptions(context),

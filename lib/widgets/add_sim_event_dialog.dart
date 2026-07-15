@@ -5,6 +5,8 @@ import '../models/sim_event.dart';
 import '../models/event_type.dart';
 import '../services/data_service.dart';
 import '../utils/snackbar_utils.dart';
+import 'add_event_type_dialog.dart';
+import 'manage_event_types_dialog.dart';
 
 class AddSimEventDialog extends StatefulWidget {
   final int currentAge;
@@ -38,6 +40,31 @@ class _AddSimEventDialogState extends State<AddSimEventDialog> {
     super.dispose();
   }
 
+  Future<void> _createNewEventType() async {
+    final EventType? newType = await showDialog<EventType>(
+      context: context,
+      builder: (context) => const AddEventTypeDialog(),
+    );
+
+    if (newType != null) {
+      setState(() {
+        selectedEventType = newType;
+      });
+    }
+  }
+
+  Future<void> _manageEventTypes() async {
+    await showDialog(
+      context: context,
+      builder: (context) => const ManageEventTypesDialog(),
+    );
+    setState(() {
+      if (!DataService.eventTypes.contains(selectedEventType)) {
+        selectedEventType = DataService.eventTypes.isNotEmpty ? DataService.eventTypes.first : null;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -60,6 +87,7 @@ class _AddSimEventDialogState extends State<AddSimEventDialog> {
               ],
             ),
             const SizedBox(height: 20),
+            
             if (DataService.eventTypes.isEmpty)
               const Text("Brak dostępnych szablonów wydarzeń!")
             else
@@ -89,7 +117,24 @@ class _AddSimEventDialogState extends State<AddSimEventDialog> {
                   });
                 },
               ),
-            const SizedBox(height: 15),
+              
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: _manageEventTypes,
+                  icon: Icon(PhosphorIcons.gear, size: 16),
+                  label: const Text("Zarządzaj"),
+                ),
+                TextButton.icon(
+                  onPressed: _createNewEventType,
+                  icon: Icon(PhosphorIcons.plus, size: 16),
+                  label: const Text("Nowy typ"),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 5),
             TextField(
               controller: descriptionController,
               decoration: const InputDecoration(

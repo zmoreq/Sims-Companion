@@ -8,6 +8,7 @@ import '../services/data_service.dart';
 import '../models/sim_event.dart';
 import '../models/event_type.dart';
 import '../widgets/add_sim_event_dialog.dart';
+import '../widgets/remove_dialog.dart';
 
 class ResidentDetailsPage extends StatefulWidget {
   final Resident resident;
@@ -115,6 +116,45 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
         ),
       ),
     );
+  }
+
+  void _showEventOptions(BuildContext context, SimEvent event) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(PhosphorIcons.trash, color: Theme.of(context).colorScheme.error),
+                title: Text('Usuń wydarzenie', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _deleteEvent(event);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteEvent(SimEvent event) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => const RemoveDialog(
+        content: "Czy na pewno chcesz usunąć to wydarzenie z historii Sima?",
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() {
+        widget.resident.events.remove(event);
+      });
+      DataService.saveData();
+    }
   }
 
   Widget _buildProfileHeader(BuildContext context) {
@@ -262,14 +302,19 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
           orElse: () => EventType(id: 'unknown', name: 'Nieznane wydarzenie', iconKey: 'star', colorValue: 0xFF9E9E9E),
         );
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onLongPress: () => _showEventOptions(context, event),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-          ),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              ),
           child: Row(
             children: [
               Container(
@@ -306,6 +351,8 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
               ),
             ],
           ),
+        )
+        )
         );
       },
     );
