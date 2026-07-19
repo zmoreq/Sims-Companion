@@ -9,6 +9,7 @@ import '../models/sim_event.dart';
 import '../models/event_type.dart';
 import '../widgets/add_sim_event_dialog.dart';
 import '../widgets/remove_dialog.dart';
+import '../utils/snackbar_utils.dart';
 
 class ResidentDetailsPage extends StatefulWidget {
   final Resident resident;
@@ -56,13 +57,15 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDead = widget.resident.house == null;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
-          "Karta Postaci",
+          isDead ? "Karta Zmarłego" : "Karta Postaci",
           style: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -87,7 +90,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              _buildProfileHeader(context),
+              _buildProfileHeader(context, isDead),
               const SizedBox(height: 30),
               _buildSectionTitle(context, "Informacje szczegółowe"),
               const SizedBox(height: 15),
@@ -97,19 +100,20 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
               const SizedBox(height: 15),
               _buildTimeline(context),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _addEvent,
-                  icon: Icon(PhosphorIcons.plusBold),
-                  label: const Text("Dodaj wydarzenie"),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              if (!isDead)
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _addEvent,
+                    icon: Icon(PhosphorIcons.plusBold),
+                    label: const Text("Dodaj wydarzenie"),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 40),
             ],
           ),
@@ -157,7 +161,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
     }
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, bool isDead) {
     return Center(
       child: Column(
         children: [
@@ -165,19 +169,22 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: isDead ? Theme.of(context).colorScheme.surfaceContainerHighest : Theme.of(context).colorScheme.primaryContainer,
               shape: BoxShape.circle,
-              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 3),
+              border: Border.all(
+                color: isDead ? Theme.of(context).colorScheme.outlineVariant : Theme.of(context).colorScheme.primary, 
+                width: 3
+              ),
             ),
             child: Icon(
-              PhosphorIcons.user,
+              isDead ? PhosphorIcons.ghostFill : PhosphorIcons.userFill,
               size: 60,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              color: isDead ? Theme.of(context).colorScheme.onSurfaceVariant : Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(height: 15),
           Text(
-            "${widget.resident.name} ${widget.resident.lastName}",
+            isDead ? "Ś.P. ${widget.resident.name} ${widget.resident.lastName}" : "${widget.resident.name} ${widget.resident.lastName}",
             style: GoogleFonts.quicksand(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -187,7 +194,9 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
           ),
           const SizedBox(height: 5),
           Text(
-            "${widget.resident.isAdult ? "Dorosły" : "Dziecko"} • Wiek: ${widget.resident.age} lat",
+            isDead 
+              ? "Zmarł(a) w wieku: ${widget.resident.age} lat"
+              : "${widget.resident.isAdult ? "Dorosły" : "Dziecko"} • Wiek: ${widget.resident.age} lat",
             style: GoogleFonts.quicksand(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -228,7 +237,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
         _buildTraitCard(context, PhosphorIcons.starBold, "Aspiracja", widget.resident.traits.aspiration),
         _buildTraitCard(context, PhosphorIcons.eyeBold, "Oczy", _translateEyeColor(widget.resident.traits.eyeColor)),
         _buildTraitCard(context, PhosphorIcons.scissorsBold, "Włosy", _translateHairColor(widget.resident.traits.hairColor)),
-        _buildTraitCard(context, PhosphorIcons.houseBold, "Dom", widget.resident.house.name),
+        _buildTraitCard(context, PhosphorIcons.houseBold, "Dom", widget.resident.house?.name ?? "Nieznany dom"),
       ],
     );
   }
@@ -370,6 +379,18 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
       setState(() {
         widget.resident.events.add(newEvent);
       });
+
+      if (newEvent.eventTypeId == 'death') {
+        widget.resident.house?.removeResident(widget.resident);
+        widget.resident.city.deceased.add(widget.resident);
+        
+        DataService.saveData();
+
+        SnackbarUtils.showError(context, "${widget.resident.name} odchodzi na Tamten Świat...");
+        Navigator.of(context).pop(); 
+        return;
+      }
+
       DataService.saveData();
     }
   }

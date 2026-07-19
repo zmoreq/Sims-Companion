@@ -12,6 +12,8 @@ import 'house_page.dart';
 import '../services/data_service.dart';
 import '../utils/snackbar_utils.dart';
 import '../widgets/remove_dialog.dart';
+import '../widgets/cemetery_card.dart';
+import 'cemetery_page.dart';
 
 class CityPage extends StatefulWidget {
   final City city;
@@ -114,18 +116,37 @@ class _CityPageState extends State<CityPage> {
 
   Widget _buildHousesList() {
     return Column(
-      children: widget.city.houses.map((houseObject) {
-        return HouseCard(
-          house: houseObject,
-          onTap: () => _navigateToHouse(houseObject),
-          onAddDay: () => _addDayToHouse(houseObject),
-          onDelete: () => _deleteHouse(houseObject),
-          onEdit: () {
-            print("Edit ${houseObject.name}");
-            // TODO: Logika edycji nazwy domu (analogiczna jak w CitiesPage)
+      children: [
+        ...widget.city.houses.map((houseObject) {
+          return HouseCard(
+            house: houseObject,
+            onTap: () => _navigateToHouse(houseObject),
+            onAddDay: () => _addDayToHouse(houseObject),
+            onDelete: () => _deleteHouse(houseObject),
+            onEdit: () {
+              print("Edit ${houseObject.name}");
+              // TODO: Logika edycji nazwy domu (analogiczna jak w CitiesPage)
+            },
+          );
+        }),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+          child: Divider(
+            thickness: 2,
+            color: Theme.of(context).colorScheme.outlineVariant.withAlpha(150),
+          ),
+        ),
+
+        CemeteryCard(
+          city: widget.city,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => CemeteryPage(city: widget.city)),
+            ).then((_) => setState(() {}));
           },
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 

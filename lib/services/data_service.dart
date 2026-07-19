@@ -8,10 +8,12 @@ class DataService {
 
   static List<EventType> eventTypes = [
     EventType(id: 'birth', name: 'Narodziny', iconKey: 'baby', colorValue: 0xFF4CAF50),
+    EventType(id: 'pregnancy', name: 'Ciąża', iconKey: 'baby', colorValue: 0xFF8BC34A),
     EventType(id: 'wedding', name: 'Ślub', iconKey: 'heart', colorValue: 0xFFE91E63),
     EventType(id: 'job', name: 'Nowa praca', iconKey: 'briefcase', colorValue: 0xFF2196F3),
     EventType(id: 'promotion', name: 'Awans', iconKey: 'trendUp', colorValue: 0xFFFFC107),
     EventType(id: 'move', name: 'Przeprowadzka', iconKey: 'house', colorValue: 0xFF9C27B0),
+    EventType(id: 'death', name: 'Śmierć', iconKey: 'skull', colorValue: 0xFF424242),
   ];
 
   static Future<void> loadData() async {

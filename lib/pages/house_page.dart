@@ -13,6 +13,7 @@ import '../widgets/resident_form_dialog.dart';
 import '../utils/snackbar_utils.dart';
 import '../widgets/remove_dialog.dart';
 import 'resident_details_page.dart';
+import '../models/sim_event.dart';
 
 class HousePage extends StatefulWidget {
   final House house;
@@ -130,6 +131,23 @@ class _HousePageState extends State<HousePage> {
         Column(
           children: [
             Text(
+              "TURA",
+              style: GoogleFonts.quicksand(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 3.0,
+                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
+              ),
+            ),
+            Text(
+              "${widget.house.turns}",
+              style: GoogleFonts.quicksand(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+            Text(
               "DZIEŃ",
               style: GoogleFonts.quicksand(
                 fontSize: 15,
@@ -204,10 +222,12 @@ class _HousePageState extends State<HousePage> {
 
   void _decrementDays() {
     setState(() {
-      widget.house.decrementDays();
-      for (var resident in widget.house.residents) {
-        resident.decrementDays();
+      if (widget.house.days > 0) {
+        for (var resident in widget.house.residents) {
+          resident.decrementDays();
+        }
       }
+      widget.house.decrementDays();
     });
     DataService.saveData();
   }
@@ -258,6 +278,17 @@ class _HousePageState extends State<HousePage> {
         newResident.traits.aspiration = residentData["aspiration"];
         newResident.traits.eyeColor = residentData["eyeColor"];
         newResident.traits.hairColor = residentData["hairColor"];
+
+        if (newResident.age == 0) {
+          newResident.events.add(
+            SimEvent(
+              eventTypeId: 'birth', 
+              simAge: 0,
+              simDays: 0,
+              description: "Witaj na świecie!",
+            )
+          );
+        }
 
         widget.house.addResident(newResident);
       });

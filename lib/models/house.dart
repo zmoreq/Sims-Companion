@@ -4,9 +4,11 @@ import 'resident.dart';
 class House {
   String name;
   final City city;
-  int turn;
+  int turns;
   int days;
   List<Resident> residents;
+
+  int daysForTurn = 4;
   
   final int maxResidents = 8;
 
@@ -15,16 +17,17 @@ class House {
   House({
     required this.name,
     required this.city,
-    this.turn = 0,
+    int? turns,
     this.days = 0,
     List<Resident>? residents,
-  }) : residents = residents ?? [];
+  }) : turns = turns ?? city.turns,
+       residents = residents ?? [];
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'city': city.name, 
-      'turn': turn,
+      'turn': turns,
       'days': days,
       'residents': residents.map((resident) => resident.toJson()).toList(),
     };
@@ -34,7 +37,7 @@ class House {
     House house = House(
       name: json['name'] ?? "Unknown House",
       city: city,
-      turn: json['turn'] ?? 0,
+      turns: json['turn'] ?? 0,
       days: json['days'] ?? 0,
     );
 
@@ -57,17 +60,27 @@ class House {
     return residents.where((resident) => resident.age == targetAge).toList();
   }
 
-  void incrementTurn() => turn++;
+  void incrementTurn() {
+    turns++;
+    city.checkAndUpdateTurn();
+  }
 
   void incrementDays() {
     days++;
-    if (days % 4 == 0) {
+    if (days % (daysForTurn + 1) == 0) {
       incrementTurn();
+      days = 1;
     }
 
   }
   
   void decrementDays() {
-    if (days > 0) days--;
+    if (days > 1) {
+      days--;
+    }
+    else if (turns > 0) {
+      turns--;
+      days = daysForTurn;
+    }
   }
 }

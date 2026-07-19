@@ -6,13 +6,13 @@ import 'sim_event.dart';
 class Resident {
   String name;
   String lastName;
-  int age; // TODO: Age and days need update but after fundamental things are done  
+  int age;
   int days;
   String notes; 
   List<SimEvent> events;
   
   final City city;
-  final House house;
+  final House? house;
   SimTraits traits;
 
   Resident({
@@ -23,7 +23,7 @@ class Resident {
     this.notes = "", 
     List<SimEvent>? events,
     required this.city,
-    required this.house,
+    this.house,
     SimTraits? traits,
   }) : traits = traits ?? SimTraits(),
        events = events ?? [];
@@ -39,12 +39,12 @@ class Resident {
       'notes': notes, 
       'events': events.map((e) => e.toJson()).toList(),
       'city': city.name,
-      'house': house.name,
+      'house': house?.name ?? "Nieznany dom",
       'traits': traits.toJson(),
     };
   }
 
-  factory Resident.fromJson(Map<String, dynamic> json, City city, House house) {
+  factory Resident.fromJson(Map<String, dynamic> json, City city, House? house) {
     return Resident(
       name: json['name'] ?? "Brak imienia",
       lastName: json['lastName'] ?? "Brak nazwiska",

@@ -112,7 +112,7 @@ void _showOptions(BuildContext context) {
                           
                                 Icon(PhosphorIcons.clockBold, size: 19, color: Theme.of(context).colorScheme.primary),
                                 SizedBox(width: 10),
-                                Text("${house.days}", style: GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 2, color: Theme.of(context).colorScheme.onSecondaryContainer)),
+                                Text("${house.turns}-${house.days}", style: GoogleFonts.fredoka(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 2, color: Theme.of(context).colorScheme.onSecondaryContainer)),
                                 ],
                               ),
                             ],

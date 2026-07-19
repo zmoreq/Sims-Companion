@@ -186,7 +186,6 @@ class _CitiesPageState extends State<CitiesPage> {
     }
   }
 
-  // ➕ Dodawanie
   Future<void> _showAddCityDialog() async {
     final TextEditingController nameController = TextEditingController();
 
