@@ -128,44 +128,62 @@ class _HousePageState extends State<HousePage> {
           padding: const EdgeInsets.all(12),
           onPressed: _decrementDays,
         ),
-        Column(
+        
+        Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              "TURA",
-              style: GoogleFonts.quicksand(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 3.0,
-                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
-              ),
+            Column(
+              children: [
+                Text(
+                  "TURA",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 3.0,
+                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
+                  ),
+                ),
+                Text(
+                  "${widget.house.turns}",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              "${widget.house.turns}",
-              style: GoogleFonts.quicksand(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
+            const SizedBox(width: 20),
+            Container(
+              width: 2,
+              height: 40,
+              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
             ),
-            Text(
-              "DZIEŃ",
-              style: GoogleFonts.quicksand(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 3.0,
-                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
-              ),
-            ),
-            Text(
-              "${widget.house.days}",
-              style: GoogleFonts.quicksand(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
+            const SizedBox(width: 20),
+            Column(
+              children: [
+                Text(
+                  "DZIEŃ",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 3.0,
+                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
+                  ),
+                ),
+                Text(
+                  "${widget.house.days}",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+
         IconButton(
           icon: Icon(PhosphorIcons.plusBold, size: 26, color: Theme.of(context).colorScheme.onPrimary),
           style: IconButton.styleFrom(
@@ -180,18 +198,49 @@ class _HousePageState extends State<HousePage> {
   }
 
   Widget _buildResidentsTitle() {
-    return Text(
-      "Residents (${widget.house.population} / ${widget.house.maxResidents})",
-      style: GoogleFonts.quicksand(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 3.0,
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-      )
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      child: Row(
+        children: [
+          Container(width: 4, height: 20, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 10),
+          Text(
+            "MIESZKAŃCY (${widget.house.population} / ${widget.house.maxResidents})",
+            style: GoogleFonts.quicksand(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2.0,
+              color: Theme.of(context).colorScheme.primary,
+            )
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildResidentsList() {
+    if (widget.house.residents.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 50.0),
+        child: Column(
+          children: [
+            Icon(PhosphorIcons.houseLine, size: 64, color: Theme.of(context).colorScheme.surfaceContainerHighest),
+            const SizedBox(height: 15),
+            Text(
+              "Ten dom jest pusty.",
+              style: GoogleFonts.quicksand(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Kliknij '+' na dolnym pasku,\naby dodać pierwszego mieszkańca.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.quicksand(fontSize: 14, color: Theme.of(context).colorScheme.outline),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       children: widget.house.residents.map((residentObject) {
         return ResidentTile(
@@ -284,8 +333,9 @@ class _HousePageState extends State<HousePage> {
             SimEvent(
               eventTypeId: 'birth', 
               simAge: 0,
-              simDays: 0,
+              houseDay: 0,
               description: "Witaj na świecie!",
+              houseTurn: widget.house.turns
             )
           );
         }

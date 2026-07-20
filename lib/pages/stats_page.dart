@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:namer_app/services/stats_service.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../models/city.dart';
+import '../models/house.dart';
+import '../services/data_service.dart';
+import '../services/stats_service.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/stat_box.dart';
 import 'generator_page.dart';
 import 'cities_page.dart';
 import 'diary_page.dart';
-import '../services/data_service.dart';
-import '../widgets/stat_box.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class StatsPage extends StatefulWidget {
   final City? city;
@@ -23,6 +24,17 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   City? selectedCity;
+  House? selectedHouse;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.city != null) {
+      selectedCity = widget.city;
+    } else if (DataService.cities.isNotEmpty) {
+      selectedCity = DataService.cities.first;
+    }
+  }
 
   Color _getColorFromString(String colorName) {
     switch (colorName) {
@@ -52,11 +64,11 @@ class _StatsPageState extends State<StatsPage> {
         break;
       case 3:
         Navigator.of(context).push(
-           MaterialPageRoute(builder: (context) => GeneratorPage(returnRoute: widget.returnRoute)),
+          MaterialPageRoute(builder: (context) => GeneratorPage(returnRoute: widget.returnRoute)),
         );
       case 4:
         Navigator.of(context).push(
-           MaterialPageRoute(builder: (context) => DiaryPage(returnRoute: widget.returnRoute)),
+          MaterialPageRoute(builder: (context) => DiaryPage(returnRoute: widget.returnRoute)),
         );
     }
   }
@@ -82,11 +94,12 @@ class _StatsPageState extends State<StatsPage> {
           child: Column(
             children: [
               _buildCitySelector(),
+              _buildHouseSelector(),
               const SizedBox(height: 10),
               _buildGeneralStatsRow(),
               _buildPlaceholderCard(),
               _buildChartsRow(),
-              const SizedBox(height: 20), // Margines dolny
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -99,41 +112,77 @@ class _StatsPageState extends State<StatsPage> {
   }
 
   Widget _buildCitySelector() {
+    if (DataService.cities.isEmpty) return const SizedBox.shrink();
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
+        children: DataService.cities.map((city) {
+          final isSelected = selectedCity == city;
+          return Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: ChoiceChip(
+              label: Text(city.name),
+              selected: isSelected,
+              selectedColor: Theme.of(context).colorScheme.primaryContainer,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              labelStyle: TextStyle(
+                color: isSelected ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+              onSelected: (_) {
+                setState(() {
+                  selectedCity = city;
+                  selectedHouse = null;
+                });
+              },
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildHouseSelector() {
+    if (selectedCity == null || selectedCity!.houses.isEmpty) return const SizedBox.shrink();
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: Row(
         children: [
-          _buildFilterChip("Wszystko", isSelected: selectedCity == null, onSelect: () => setState(() => selectedCity = null)),
+          ChoiceChip(
+            label: const Text("Wszystkie domy"),
+            selected: selectedHouse == null,
+            selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            labelStyle: TextStyle(
+              color: selectedHouse == null ? Theme.of(context).colorScheme.onTertiaryContainer : Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+            onSelected: (_) => setState(() => selectedHouse = null),
+          ),
           const SizedBox(width: 10),
-          ...DataService.cities.map((city) {
+          ...selectedCity!.houses.map((house) {
+            final isSelected = selectedHouse == house;
             return Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: _buildFilterChip(
-                city.name, 
-                isSelected: selectedCity == city, 
-                onSelect: () => setState(() => selectedCity = city)
+              child: ChoiceChip(
+                label: Text(house.name),
+                selected: isSelected,
+                selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                labelStyle: TextStyle(
+                  color: isSelected ? Theme.of(context).colorScheme.onTertiaryContainer : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+                onSelected: (_) => setState(() => selectedHouse = house),
               ),
             );
           }),
         ],
       ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, {required bool isSelected, required VoidCallback onSelect}) {
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      labelStyle: TextStyle(
-        color: isSelected 
-            ? Theme.of(context).colorScheme.onTertiaryContainer 
-            : Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.bold,
-      ),
-      onSelected: (_) => onSelect(),
     );
   }
 
@@ -144,19 +193,19 @@ class _StatsPageState extends State<StatsPage> {
         children: [
           Expanded(child: StatBox(
             label: "Populacja", 
-            value: StatsService.getTotalPopulation(selectedCity: selectedCity).toString(), 
+            value: StatsService.getTotalPopulation(selectedCity: selectedCity, selectedHouse: selectedHouse).toString(), 
             icon: PhosphorIcons.usersBold
           )),
           const SizedBox(width: 10),
           Expanded(child: StatBox(
             label: "Domy", 
-            value: StatsService.getTotalHouses(selectedCity: selectedCity).toString(), 
+            value: StatsService.getTotalHouses(selectedCity: selectedCity).toString(),
             icon: PhosphorIcons.houseBold
           )),
           const SizedBox(width: 10),
           Expanded(child: StatBox(
             label: "Średni wiek", 
-            value: StatsService.getAverageAge(selectedCity: selectedCity).toString(), 
+            value: StatsService.getAverageAge(selectedCity: selectedCity, selectedHouse: selectedHouse).toString(), 
             icon: PhosphorIcons.calendarBold
           )),
         ],
@@ -201,10 +250,10 @@ class _StatsPageState extends State<StatsPage> {
             child: _buildDonutChartCard(
               title: "Kolor oczu",
               possibleColors: StatsService.possibleEyeColors,
-              getValue: (color) => StatsService.getEyeColorValueForChart(color, selectedCity: selectedCity),
-              getPercentage: (color) => StatsService.getEyeColorPercentageForChart(color, selectedCity: selectedCity),
-              getMissingValue: () => StatsService.getResidentsWithNoEyeColor(selectedCity: selectedCity),
-              getMissingPercentage: () => StatsService.getResidentsWithNoEyeColorPercentage(selectedCity: selectedCity),
+              getValue: (color) => StatsService.getEyeColorValueForChart(color, selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getPercentage: (color) => StatsService.getEyeColorPercentageForChart(color, selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getMissingValue: () => StatsService.getResidentsWithNoEyeColor(selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getMissingPercentage: () => StatsService.getResidentsWithNoEyeColorPercentage(selectedCity: selectedCity, selectedHouse: selectedHouse),
             ),
           ),
           const SizedBox(width: 10),
@@ -212,10 +261,10 @@ class _StatsPageState extends State<StatsPage> {
             child: _buildDonutChartCard(
               title: "Kolor włosów",
               possibleColors: StatsService.possibleHairColors,
-              getValue: (color) => StatsService.getHairColorValueForChart(color, selectedCity: selectedCity),
-              getPercentage: (color) => StatsService.getHairColorPercentageForChart(color, selectedCity: selectedCity),
-              getMissingValue: () => StatsService.getResidentsWithNoHairColor(selectedCity: selectedCity),
-              getMissingPercentage: () => StatsService.getResidentsWithNoHairColorPercentage(selectedCity: selectedCity),
+              getValue: (color) => StatsService.getHairColorValueForChart(color, selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getPercentage: (color) => StatsService.getHairColorPercentageForChart(color, selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getMissingValue: () => StatsService.getResidentsWithNoHairColor(selectedCity: selectedCity, selectedHouse: selectedHouse),
+              getMissingPercentage: () => StatsService.getResidentsWithNoHairColorPercentage(selectedCity: selectedCity, selectedHouse: selectedHouse),
             ),
           ),
         ],

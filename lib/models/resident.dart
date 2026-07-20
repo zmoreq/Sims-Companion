@@ -12,7 +12,7 @@ class Resident {
   List<SimEvent> events;
   
   final City city;
-  final House? house;
+  House? house;
   SimTraits traits;
 
   Resident({

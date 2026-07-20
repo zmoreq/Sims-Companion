@@ -102,11 +102,13 @@ class _CityPageState extends State<CityPage> {
                   letterSpacing: 5.0,
                 ),
           ),
+          const SizedBox(height: 5),
           Text(
-            "Tutaj możesz zarządzać swoim miastem",
+            "Populacja: ${widget.city.population}  •  Obecna tura: ${widget.city.turns}",
             style: GoogleFonts.quicksand(
               fontSize: 16,
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -117,24 +119,38 @@ class _CityPageState extends State<CityPage> {
   Widget _buildHousesList() {
     return Column(
       children: [
-        ...widget.city.houses.map((houseObject) {
-          return HouseCard(
-            house: houseObject,
-            onTap: () => _navigateToHouse(houseObject),
-            onAddDay: () => _addDayToHouse(houseObject),
-            onDelete: () => _deleteHouse(houseObject),
-            onEdit: () {
-              print("Edit ${houseObject.name}");
-              // TODO: Logika edycji nazwy domu (analogiczna jak w CitiesPage)
-            },
-          );
-        }),
+        if (widget.city.houses.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 30),
+            child: Column(
+              children: [
+                Icon(PhosphorIcons.buildings, size: 48, color: Theme.of(context).colorScheme.outlineVariant),
+                const SizedBox(height: 10),
+                Text(
+                  "Brak domów w mieście.",
+                  style: GoogleFonts.quicksand(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+          )
+        else
+          ...widget.city.houses.map((houseObject) {
+            return HouseCard(
+              house: houseObject,
+              onTap: () => _navigateToHouse(houseObject),
+              onAddDay: () => _addDayToHouse(houseObject),
+              onDelete: () => _deleteHouse(houseObject),
+              onEdit: () {
+                print("Edit ${houseObject.name}");
+              },
+            );
+          }),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
           child: Divider(
             thickness: 2,
-            color: Theme.of(context).colorScheme.outlineVariant.withAlpha(150),
+            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.6),
           ),
         ),
 

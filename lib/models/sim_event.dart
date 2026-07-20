@@ -1,13 +1,15 @@
 class SimEvent {
   String eventTypeId;
   int simAge;
-  int simDays;
+  int houseDay;
+  int houseTurn;
   String? description;
 
   SimEvent({
     required this.eventTypeId,
     required this.simAge,
-    required this.simDays,
+    required this.houseDay,
+    required this.houseTurn,
     this.description,
   });
 
@@ -15,7 +17,8 @@ class SimEvent {
     return {
       'eventTypeId': eventTypeId,
       'simAge': simAge,
-      'simDays': simDays,
+      'houseDay': houseDay,
+      'houseTurn': houseTurn,
       'description': description,
     };
   }
@@ -24,7 +27,8 @@ class SimEvent {
     return SimEvent(
       eventTypeId: json['eventTypeId'] ?? '',
       simAge: json['simAge'] ?? 0,
-      simDays: json['simDays'] ?? 0,
+      houseDay: json['houseDay'] ?? 0,
+      houseTurn: json['houseTurn'] ?? 0,
       description: json['description'],
     );
   }

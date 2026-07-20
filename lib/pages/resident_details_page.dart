@@ -99,7 +99,6 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
               _buildSectionTitle(context, "Oś czasu i wydarzenia"),
               const SizedBox(height: 15),
               _buildTimeline(context),
-              const SizedBox(height: 20),
               if (!isDead)
                 SizedBox(
                   width: double.infinity,
@@ -324,56 +323,78 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
               ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Color(eventType.colorValue).withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(_getIconFromKey(eventType.iconKey), color: Color(eventType.colorValue)),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      eventType.name,
-                      style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    if (event.description != null && event.description!.isNotEmpty)
-                      Text(
-                        event.description!,
-                        style: GoogleFonts.quicksand(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                      ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
                 children: [
-                  Text("Wiek: ${event.simAge}", style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 12)),
-                  Text("Dzień: ${event.simDays}", style: GoogleFonts.quicksand(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Color(eventType.colorValue).withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(_getIconFromKey(eventType.iconKey), color: Color(eventType.colorValue)),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          eventType.name,
+                          style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        if (event.description != null && event.description!.isNotEmpty)
+                          Text(
+                            event.description!,
+                            style: GoogleFonts.quicksand(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Wiek: ${event.simAge}", 
+                        style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).colorScheme.primary)
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Tura: ${event.houseTurn}-${event.houseDay}", 
+                        style: GoogleFonts.quicksand(fontSize: 12, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurfaceVariant)
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        )
-        )
+            ),
+          )
         );
       },
     );
   }
+
+  IconData _getIconFromKey(String key) {
+    switch (key) {
+      case 'baby': return PhosphorIcons.baby;
+      case 'heart': return PhosphorIcons.heart;
+      case 'briefcase': return PhosphorIcons.briefcase;
+      case 'trendUp': return PhosphorIcons.trendUp;
+      case 'house': return PhosphorIcons.house;
+      case 'skull': return PhosphorIcons.skull;
+      case 'church': return PhosphorIcons.church;
+      default: return PhosphorIcons.star;
+    }
+  }
+
   Future<void> _addEvent() async {
     final SimEvent? newEvent = await showDialog<SimEvent>(
       context: context,
       builder: (context) => AddSimEventDialog(
-        currentAge: widget.resident.age,
-        currentDays: widget.resident.days,
+        resident: widget.resident,
       ),
     );
+
+    if (!mounted) return;
 
     if (newEvent != null) {
       setState(() {
@@ -382,6 +403,7 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
 
       if (newEvent.eventTypeId == 'death') {
         widget.resident.house?.removeResident(widget.resident);
+        widget.resident.house = null; 
         widget.resident.city.deceased.add(widget.resident);
         
         DataService.saveData();
@@ -392,17 +414,6 @@ class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
       }
 
       DataService.saveData();
-    }
-  }
-
-  IconData _getIconFromKey(String key) {
-    switch (key) {
-      case 'baby': return PhosphorIcons.baby;
-      case 'heart': return PhosphorIcons.heart;
-      case 'briefcase': return PhosphorIcons.briefcase;
-      case 'trendUp': return PhosphorIcons.trendUp;
-      case 'house': return PhosphorIcons.house;
-      default: return PhosphorIcons.star;
     }
   }
 }

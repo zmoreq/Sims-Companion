@@ -10,6 +10,7 @@ import 'diary_page.dart';
 import '../services/data_service.dart';
 import '../utils/snackbar_utils.dart';
 import '../widgets/remove_dialog.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class CitiesPage extends StatefulWidget {
   const CitiesPage({super.key});
@@ -50,18 +51,21 @@ class _CitiesPageState extends State<CitiesPage> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 60),
-              _buildHeader(context),
-              _buildCitiesList(),
-            ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                _buildHeader(context),
+                _buildCitiesList(),
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ),
       ),
@@ -91,6 +95,7 @@ class _CitiesPageState extends State<CitiesPage> {
                 letterSpacing: 5.0,
               )
         ),
+        const SizedBox(height: 10),
         Text(
           "Zarządzaj swoją Simsową populacją",
           style: GoogleFonts.quicksand(
@@ -99,17 +104,39 @@ class _CitiesPageState extends State<CitiesPage> {
           ),
         ),
         Divider(
-          height: 60,
+          height: 40,
           thickness: 2,
-          color: Theme.of(context).colorScheme.outline,
-          indent: 25,
-          endIndent: 25,
+          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+          indent: 40,
+          endIndent: 40,
         ),
       ],
     );
   }
 
   Widget _buildCitiesList() {
+    if (DataService.cities.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 50.0),
+        child: Column(
+          children: [
+            Icon(PhosphorIcons.mapTrifold, size: 64, color: Theme.of(context).colorScheme.outlineVariant),
+            const SizedBox(height: 15),
+            Text(
+              "Witaj w Sims Companion!",
+              style: GoogleFonts.quicksand(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Kliknij '+' na dole, aby założyć\nswoje pierwsze miasto.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.quicksand(fontSize: 14, color: Theme.of(context).colorScheme.outline),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       children: DataService.cities.map((cityObject) {
         return Padding(
