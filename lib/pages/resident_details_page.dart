@@ -23,7 +23,7 @@ class ResidentDetailsPage extends StatefulWidget {
 class _ResidentDetailsPageState extends State<ResidentDetailsPage> {
   
   String _translateEyeColor(String? color) {
-    const map = {'brown': 'Brązowe', 'blue': 'Niebieskie', 'green': 'Zielone', 'grey': 'Szare', 'red': 'Czerwone'};
+    const map = {'brown': 'Brązowe', 'darkblue': 'Niebieskie', 'lightblue': 'Jasnoniebieskie', 'green': 'Zielone', 'grey': 'Szare', 'red': 'Czerwone'};
     return map[color] ?? 'Nieznane';
   }
 
