@@ -5,7 +5,7 @@ import 'data_service.dart';
 
 class StatsService {
   static const List<String> possibleEyeColors = [
-    'brown', 'blue', 'green', 'grey', 'red'
+    'brown', 'darkblue', 'lightblue', 'green', 'grey', 'red'
   ];
 
   static const List<String> possibleHairColors = [

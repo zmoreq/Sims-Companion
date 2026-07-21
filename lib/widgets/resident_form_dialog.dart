@@ -23,7 +23,7 @@ class _ResidentFormDialogState extends State<ResidentFormDialog> {
   String? hairColor;
 
   final Map<String, String> eyeColorLabels = {
-    'brown': 'Brązowe', 'blue': 'Niebieskie', 'green': 'Zielone',
+    'brown': 'Brązowe', 'darkblue': 'Niebieskie', 'lightblue': 'Jasnoniebieskie', 'green': 'Zielone',
     'grey': 'Szare', 'red': 'Czerwone',
   };
 

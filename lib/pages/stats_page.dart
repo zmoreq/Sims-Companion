@@ -39,7 +39,8 @@ class _StatsPageState extends State<StatsPage> {
   Color _getColorFromString(String colorName) {
     switch (colorName) {
       case 'brown': return Colors.brown;
-      case 'blue': return Colors.blue;
+      case 'darkblue': return Colors.blue[900]!;
+      case 'lightblue': return Colors.lightBlue;
       case 'green': return Colors.green;
       case 'grey': return Colors.grey;
       case 'red': return Colors.red;
