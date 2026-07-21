@@ -50,4 +50,34 @@ class DataService {
       print("Error while saving data: $e");
     }
   }
+
+  static String exportBackup() {
+    Map<String, dynamic> backup = {
+      'cities': cities.map((city) => city.toJson()).toList(),
+      'eventTypes': eventTypes.map((e) => e.toJson()).toList(),
+    };
+    return jsonEncode(backup);
+  }
+
+  static Future<bool> importBackup(String backupJson) async {
+    try {
+      Map<String, dynamic> backup = jsonDecode(backupJson);
+
+      if (backup.containsKey('cities')) {
+        List<dynamic> citiesList = backup['cities'];
+        cities = citiesList.map((cityJson) => City.fromJson(cityJson as Map<String, dynamic>)).toList();
+      }
+
+      if (backup.containsKey('eventTypes')) {
+        List<dynamic> eventsList = backup['eventTypes'];
+        eventTypes = eventsList.map((e) => EventType.fromJson(e as Map<String, dynamic>)).toList();
+      }
+
+      await saveData();
+      return true;
+    } catch (e) {
+      print("Error importing backup: $e");
+      return false;
+    }
+  }
 }

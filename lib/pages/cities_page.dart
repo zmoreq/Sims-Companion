@@ -11,6 +11,7 @@ import '../services/data_service.dart';
 import '../utils/snackbar_utils.dart';
 import '../widgets/remove_dialog.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import '../widgets/backup_dialog.dart';
 
 class CitiesPage extends StatefulWidget {
   const CitiesPage({super.key});
@@ -60,7 +61,30 @@ class _CitiesPageState extends State<CitiesPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10.0, right: 20.0),
+                    child: IconButton(
+                      icon: Icon(PhosphorIcons.floppyDisk, size: 28, color: Theme.of(context).colorScheme.primary),
+                      tooltip: "Kopia zapasowa",
+                      onPressed: () async {
+                        bool? didImport = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => const BackupDialog(),
+                        );
+
+                        if (!mounted) return;
+                        
+                        if (didImport == true) {
+                          setState(() {});
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 10),
                 _buildHeader(context),
                 _buildCitiesList(),
                 const SizedBox(height: 80),
